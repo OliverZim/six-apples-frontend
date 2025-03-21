@@ -27,9 +27,9 @@
 
     box-sizing: border-box;
     border: 1px solid #5b616a;
-    border-radius: 0.2rem;
+    border-radius: 10px;
     /* for the radius we need some padding otherwise the corners will be nearly hidden */
-    padding: 1px;
+    padding: 3px;
 }
 
 .input {

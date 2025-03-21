@@ -109,7 +109,7 @@ export default class QueryStore extends Store<QueryStoreState> {
             },
             maxAlternativeRoutes: 3,
             routingProfile: {
-                name: '',
+                name: 'foot',
             },
             customModelEnabled: customModelEnabledInitially,
             customModelStr: initialCustomModelStr,
