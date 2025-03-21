@@ -8,20 +8,25 @@ import LayerImg from './layer-group-solid.svg'
 import * as config from 'config'
 
 export default function (props: MapOptionsStoreState) {
-    const [isOpen, setIsOpen] = useState(false)
+    const isMap = props.selectedStyle.name === 'Map'
+    
+    const toggleMapStyle = () => {
+        const nextStyle = isMap ? 'Satellite' : 'Map'
+        Dispatcher.dispatch(new SelectMapLayer(nextStyle))
+    }
+
     return (
-        <div
-            className={styles.mapOptionsContainer}
-            onMouseEnter={() => setIsOpen(true)}
-            onMouseLeave={() => setIsOpen(false)}
-        >
-            {isOpen ? (
-                <Options storeState={props} notifyChanged={() => setIsOpen(false)} />
-            ) : (
-                <PlainButton className={styles.layerButton} onClick={() => setIsOpen(true)}>
-                    <LayerImg />
-                </PlainButton>
-            )}
+        <div className={styles.mapOptionsContainer}>
+            <PlainButton 
+                className={styles.layerButton} 
+                onClick={toggleMapStyle}
+                title={`Switch to ${isMap ? 'Satellite' : 'Map'} view`}
+            >
+                <LayerImg />
+                <div className={styles.buttonContent}>
+                    {isMap ? 'Satellite' : 'Map'}
+                </div>
+            </PlainButton>
         </div>
     )
 }
