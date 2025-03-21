@@ -32,29 +32,29 @@ interface OptionsProps {
 }
 
 const Options = function ({ storeState, notifyChanged }: OptionsProps) {
+    const isMap = storeState.selectedStyle.name === 'Map'
+    
     return (
         <div className={styles.options}>
-            <div
-                onChange={e => {
-                    notifyChanged()
-                    onStyleChange(e.target as HTMLInputElement)
-                }}
-            >
-                {storeState.styleOptions.map(option => (
-                    <div className={styles.option} key={option.name}>
-                        <input
-                            type="radio"
-                            id={option.name}
-                            name="layer"
-                            value={option.name}
-                            defaultChecked={option === storeState.selectedStyle}
-                            disabled={!storeState.isMapLoaded}
-                        />
-                        <label htmlFor={option.name}>
-                            {option.name + (option.type === 'vector' ? ' (Vector)' : '')}
-                        </label>
-                    </div>
-                ))}
+            <div className={styles.switchContainer}>
+                <div 
+                    className={`${styles.switchOption} ${isMap ? styles.selected : ''}`}
+                    onClick={() => {
+                        notifyChanged()
+                        onStyleChange('Map')
+                    }}
+                >
+                    Map
+                </div>
+                <div 
+                    className={`${styles.switchOption} ${!isMap ? styles.selected : ''}`}
+                    onClick={() => {
+                        notifyChanged()
+                        onStyleChange('Satellite')
+                    }}
+                >
+                    Satellite
+                </div>
             </div>
             {config.routingGraphLayerAllowed && (
                 <>
@@ -104,6 +104,6 @@ const Options = function ({ storeState, notifyChanged }: OptionsProps) {
     )
 }
 
-function onStyleChange(target: HTMLInputElement) {
-    Dispatcher.dispatch(new SelectMapLayer(target.value))
+function onStyleChange(layerName: string) {
+    Dispatcher.dispatch(new SelectMapLayer(layerName))
 }

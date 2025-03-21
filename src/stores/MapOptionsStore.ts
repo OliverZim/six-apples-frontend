@@ -58,7 +58,7 @@ const mapTilerSatellite: VectorStyle = {
     attribution: osmAttribution + ', &copy; <a href="https://www.maptiler.com/copyright/" target="_blank">MapTiler</a>',
 }
 const osmOrg: RasterStyle = {
-    name: 'OpenStreetMap',
+    name: 'Map',
     type: 'raster',
     url: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
     attribution: osmAttribution,
@@ -88,7 +88,7 @@ const omniscale: RasterStyle = {
     tilePixelRatio: tilePixelRatio,
 }
 const esriSatellite: RasterStyle = {
-    name: 'Esri Satellite',
+    name: 'Satellite',
     type: 'raster',
     url: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
     attribution:
