@@ -5,7 +5,7 @@ import { useEffect } from 'react'
 import VectorLayer from 'ol/layer/Vector'
 import VectorSource from 'ol/source/Vector'
 import { GeoJSON } from 'ol/format'
-import { Stroke, Style } from 'ol/style'
+import { Circle, Fill, Stroke, Style } from 'ol/style'
 import { fromLonLat } from 'ol/proj'
 import { Select } from 'ol/interaction'
 import { click } from 'ol/events/condition'
@@ -15,6 +15,7 @@ import { SelectEvent } from 'ol/interaction/Select'
 import { QueryPoint } from '@/stores/QueryStore'
 import { distance } from 'ol/coordinate'
 import LineString from 'ol/geom/LineString'
+import { Geometry, Point } from 'ol/geom'
 
 const pathsLayerKey = 'pathsLayer'
 const selectedPathLayerKey = 'selectedPathLayer'
@@ -142,31 +143,78 @@ function addAccessNetworkLayer(map: Map, selectedPath: Path, queryPoints: QueryP
     map.addLayer(layer)
 }
 
+function getRandomColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+
 function addSelectedPathsLayer(map: Map, selectedPath: Path) {
-    const styleArray = [
-        new Style({
+    console.log(selectedPath.points.coordinates);
+    
+    const segments = selectedPath.points.coordinates;
+    const features: Feature<Geometry>[] = [];
+    const styles: Style[] = [];
+
+    for (let i = 0; i < segments.length - 1; i++) {
+        const start = fromLonLat(segments[i]);
+        const end = fromLonLat(segments[i + 1]);
+        const lineFeature = new Feature(new LineString([start, end]));
+        features.push(lineFeature);
+
+        const color = getRandomColor();
+        const style = new Style({
             stroke: new Stroke({
-                color: 'rgba(255,255,255,0.9)',
-                width: 10,
-            }),
-        }),
-        new Style({
-            stroke: new Stroke({
-                color: 'rgba(39,100,200,0.85)',
+                color: color,
                 width: 8,
             }),
+        });
+        styles.push(style);
+    }
+
+    const pointFeatures = segments.map(c => {
+        const point = new Point(fromLonLat(c));
+        return new Feature(point);
+    });
+
+    const pointStyle = new Style({
+        image: new Circle({
+            radius: 5,
+            fill: new Fill({ color: 'rgba(255, 0, 0, 0.8)' }),
+            stroke: new Stroke({ color: 'rgba(255, 255, 255, 0.8)', width: 2 }),
         }),
-    ]
+    });
+
+    // for all the features in the feature list - print the type
+    features.forEach(f => {
+        const geometry = f.getGeometry();
+        if (geometry) {
+            console.log(geometry.getType());
+        }
+    });
+
     const layer = new VectorLayer({
         source: new VectorSource({
-            features: [new Feature(new LineString(selectedPath.points.coordinates.map(c => fromLonLat(c))))],
+            features: [...features, ...pointFeatures],
         }),
-        style: styleArray,
+        style: (feature) => {
+            if (feature.getGeometry() instanceof Point) {
+                return pointStyle;
+            } 
+            else {
+                const index = features.indexOf(feature as Feature<Geometry>);
+                return styles[index];
+            }
+        },
         opacity: 0.8,
         zIndex: 2,
-    })
-    layer.set(selectedPathLayerKey, true)
-    map.addLayer(layer)
+    });
+
+    layer.set('selectedPathLayerKey', true);
+    map.addLayer(layer);
 }
 
 function removeSelectPathInteractions(map: Map) {
