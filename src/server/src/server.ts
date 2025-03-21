@@ -42,13 +42,13 @@ app.post('/api/auth/signup', async (req, res) => {
         const result = await AuthService.signup(username, email, password);
         if (result.success && result.user) {
             req.session.userId = result.user.id;
-            res.json(result);
+            return res.json(result);
         } else {
-            res.status(400).json(result);
+            return res.status(400).json(result);
         }
     } catch (error) {
         console.error('Signup error:', error);
-        res.status(500).json({ success: false, error: 'Server error' });
+        return res.status(500).json({ success: false, error: 'Server error' });
     }
 });
 
@@ -63,13 +63,13 @@ app.post('/api/auth/login', async (req, res) => {
         const result = await AuthService.login(email, password);
         if (result.success && result.user) {
             req.session.userId = result.user.id;
-            res.json(result);
+            return res.json(result);
         } else {
-            res.status(401).json(result);
+            return res.status(401).json(result);
         }
     } catch (error) {
         console.error('Login error:', error);
-        res.status(500).json({ success: false, error: 'Server error' });
+        return res.status(500).json({ success: false, error: 'Server error' });
     }
 });
 
@@ -77,9 +77,9 @@ app.post('/api/auth/logout', (req, res) => {
     req.session.destroy((err) => {
         if (err) {
             console.error('Logout error:', err);
-            res.status(500).json({ success: false, error: 'Error logging out' });
+            return res.status(500).json({ success: false, error: 'Error logging out' });
         } else {
-            res.json({ success: true });
+            return res.json({ success: true });
         }
     });
 });
@@ -92,13 +92,13 @@ app.get('/api/auth/me', async (req, res) => {
     try {
         const user = await AuthService.findUserById(req.session.userId);
         if (user) {
-            res.json({ success: true, user });
+            return res.json({ success: true, user });
         } else {
-            res.status(404).json({ success: false, error: 'User not found' });
+            return res.status(404).json({ success: false, error: 'User not found' });
         }
     } catch (error) {
         console.error('Get current user error:', error);
-        res.status(500).json({ success: false, error: 'Server error' });
+        return res.status(500).json({ success: false, error: 'Server error' });
     }
 });
 
