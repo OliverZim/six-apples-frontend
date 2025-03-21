@@ -3,15 +3,16 @@
     align-items: center;
     position: relative;
     margin: 0.5rem;
-    max-width: calc(100% - 48px); /* Increased space for unfold_less button */
-    padding-right: 40px; /* Increased padding for better hitbox */
+    max-width: 90%;
 }
 
 .buttonContainer {
     display: flex;
     gap: 0.5rem;
-    margin-right: 0.75rem; /* Increased margin */
     flex-shrink: 0;
+    align-items: left;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
 }
 
 .profileButton {
@@ -46,11 +47,10 @@
 .carousel {
     display: flex;
     align-items: center;
+    position: relative;
     flex: 1;
     min-width: 0;
     padding: 0;
-    position: relative;
-    margin: 0 32px; /* Added margin to make space for chevrons */
 }
 
 .profiles {
@@ -63,7 +63,6 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
     min-width: 0;
-    position: relative;
     width: 100%;
 }
 
@@ -112,8 +111,8 @@
     position: absolute;
     background: white;
     z-index: 2;
-    width: 32px; /* Increased size */
-    height: 32px; /* Increased size */
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -127,11 +126,11 @@
 }
 
 .chevron:first-child {
-    left: -32px; /* Positioned outside the carousel */
+    left: 0;
 }
 
 .chevron.flip {
-    right: -32px; /* Positioned outside the carousel */
+    right: 0;
     transform: translateY(-50%) rotate(180deg);
 }
 
@@ -150,20 +149,25 @@
 
 /* Styles for the unfold_less button container */
 .unfoldButton {
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 40px; /* Increased hitbox */
-    height: 40px; /* Increased hitbox */
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     background: transparent;
     border: none;
-    padding: 8px;
-    z-index: 3;
+    padding: 6px;
+}
+
+.unfoldButton:hover {
+    background: #f5f5f5;
+    border-radius: 50%;
+}
+
+.unfoldButton svg {
+    width: 20px;
+    height: 20px;
 }
 
 .cmBox, .enabledCMBox {
