@@ -64,9 +64,9 @@
 }
 
 .header {
-    padding: 16px;
     display: flex;
     align-items: center;
+    padding: 16px;
     border-bottom: 1px solid #e0e0e0;
     position: relative;
 }
@@ -78,25 +78,35 @@
     transform: translateY(-50%);
     background: none;
     border: none;
-    font-size: 20px;
-    color: #5f6368;
+    font-size: 24px;
     cursor: pointer;
     padding: 8px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
+    color: #5f6368;
 }
 
 .closeButton:hover {
-    background: #f1f3f4;
+    background-color: #f1f3f4;
+    border-radius: 50%;
+}
+
+.logoContainer {
+    display: flex;
+    align-items: center;
+    margin: 0 auto;
+    gap: 12px;
 }
 
 .logo {
-    height: 24px;
-    margin: 0 auto;
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+}
+
+.logoText {
+    font-size: 20px;
+    font-weight: 400;
+    color: #202124;
+    margin: 0;
 }
 
 .userInfo {
@@ -207,4 +217,84 @@
 .dot {
     font-size: 8px;
     line-height: 1;
+}
+
+.authContainer {
+    padding: 24px;
+}
+
+.authToggle {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.authToggleButton {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    background: none;
+    font-size: 16px;
+    color: #5f6368;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+}
+
+.authToggleButton.active {
+    color: #1a73e8;
+    border-bottom-color: #1a73e8;
+}
+
+.error {
+    color: #d93025;
+    font-size: 14px;
+    margin-bottom: 16px;
+    padding: 8px;
+    background: #fce8e6;
+    border-radius: 4px;
+}
+
+.authForm {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.formGroup label {
+    font-size: 14px;
+    color: #5f6368;
+}
+
+.formGroup input {
+    padding: 8px 12px;
+    border: 1px solid #dadce0;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.formGroup input:focus {
+    outline: none;
+    border-color: #1a73e8;
+}
+
+.submitButton {
+    background: #1a73e8;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.submitButton:hover {
+    background: #1557b0;
 } 
