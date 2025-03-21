@@ -181,18 +181,8 @@ const wanderreitkarte: RasterStyle = {
 }
 
 const styleOptions: StyleOption[] = [
-    omniscale,
     osmOrg,
-    osmCycl,
     esriSatellite,
-    mapTilerSatellite,
-    tfTransport,
-    tfCycle,
-    tfOutdoors,
-    kurviger,
-    mapillion,
-    lyrk,
-    wanderreitkarte,
 ]
 
 export default class MapOptionsStore extends Store<MapOptionsStoreState> {
@@ -207,7 +197,7 @@ export default class MapOptionsStore extends Store<MapOptionsStoreState> {
                 `Could not find tile layer specified in config: '${config.defaultTiles}', using default instead`
             )
         return {
-            selectedStyle: selectedStyle ? selectedStyle : omniscale,
+            selectedStyle: selectedStyle ? selectedStyle : osmOrg,
             styleOptions,
             routingGraphEnabled: false,
             urbanDensityEnabled: false,
