@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import styles from './Profile.module.css'
 import { tr } from '@/translation/Translation'
+import compassLogo from './compass-logo.png'
 
 interface ProfileState {
     isLoggedIn: boolean
@@ -29,10 +30,13 @@ export default function Profile({ isOpen, onClose }: ProfileProps) {
                     <button className={styles.closeButton} onClick={onClose}>
                         ✕
                     </button>
-                    <img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" 
-                         alt="Google" 
-                         className={styles.logo}
-                    />
+                    <div className={styles.logoContainer}>
+                        <img src={compassLogo}
+                             alt="6 Apples a Day" 
+                             className={styles.logo}
+                        />
+                        <h1 className={styles.logoText}>6 Apples a Day</h1>
+                    </div>
                 </div>
 
                 <div className={styles.userInfo}>
@@ -43,7 +47,7 @@ export default function Profile({ isOpen, onClose }: ProfileProps) {
                         <h2>{profileState.username}</h2>
                         <p>{profileState.email}</p>
                         <button className={styles.manageButton}>
-                            {tr('Manage your Google Account')}
+                            {tr('Manage your Account')}
                         </button>
                     </div>
                 </div>

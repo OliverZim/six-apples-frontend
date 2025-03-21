@@ -64,9 +64,9 @@
 }
 
 .header {
-    padding: 16px;
     display: flex;
     align-items: center;
+    padding: 16px;
     border-bottom: 1px solid #e0e0e0;
     position: relative;
 }
@@ -78,25 +78,35 @@
     transform: translateY(-50%);
     background: none;
     border: none;
-    font-size: 20px;
-    color: #5f6368;
+    font-size: 24px;
     cursor: pointer;
     padding: 8px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
+    color: #5f6368;
 }
 
 .closeButton:hover {
-    background: #f1f3f4;
+    background-color: #f1f3f4;
+    border-radius: 50%;
+}
+
+.logoContainer {
+    display: flex;
+    align-items: center;
+    margin: 0 auto;
+    gap: 12px;
 }
 
 .logo {
-    height: 24px;
-    margin: 0 auto;
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+}
+
+.logoText {
+    font-size: 20px;
+    font-weight: 400;
+    color: #202124;
+    margin: 0;
 }
 
 .userInfo {
