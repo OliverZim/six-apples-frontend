@@ -1,0 +1,210 @@
+.profileContainer {
+    position: absolute;
+    z-index: 2;
+    top: 10px;
+    right: 10px;
+    display: flex;
+}
+
+.profileButton {
+    margin: 5px !important;
+    padding: 3px !important;
+    width: 34px !important;
+    height: 34px !important;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    transition: all 0.2s ease;
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+}
+
+.profileButton:hover {
+    background: #f5f5f5;
+}
+
+.profileButton svg {
+    width: 14px;
+    height: 14px;
+    color: #666;
+}
+
+.buttonContent {
+    color: #666;
+    font-size: 8px;
+    font-weight: 500;
+    white-space: nowrap;
+    line-height: 1;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 20px;
+}
+
+.profilePanel {
+    background: white;
+    border-radius: 8px;
+    width: 360px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    position: relative;
+}
+
+.header {
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #e0e0e0;
+    position: relative;
+}
+
+.closeButton {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #5f6368;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+}
+
+.closeButton:hover {
+    background: #f1f3f4;
+}
+
+.logo {
+    height: 24px;
+    margin: 0 auto;
+}
+
+.userInfo {
+    padding: 24px;
+    display: flex;
+    gap: 16px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.avatar {
+    width: 80px;
+    height: 80px;
+    background: #1a73e8;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 32px;
+    font-weight: 500;
+}
+
+.userDetails {
+    flex: 1;
+}
+
+.userDetails h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 500;
+    color: #202124;
+}
+
+.userDetails p {
+    margin: 4px 0 16px;
+    color: #5f6368;
+    font-size: 14px;
+}
+
+.manageButton {
+    background: none;
+    border: 1px solid #dadce0;
+    border-radius: 100px;
+    padding: 8px 24px;
+    color: #1a73e8;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.manageButton:hover {
+    background: #f8f9fa;
+}
+
+.menuItems {
+    padding: 8px 0;
+}
+
+.menuItem {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 12px 24px;
+    border: none;
+    background: none;
+    font-size: 14px;
+    color: #3c4043;
+    cursor: pointer;
+    text-align: left;
+}
+
+.menuItem:hover {
+    background: #f8f9fa;
+}
+
+.icon {
+    margin-right: 16px;
+    font-size: 18px;
+    width: 24px;
+    text-align: center;
+}
+
+.divider {
+    height: 1px;
+    background: #e0e0e0;
+    margin: 8px 0;
+}
+
+.footer {
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #5f6368;
+}
+
+.footer a {
+    color: #5f6368;
+    text-decoration: none;
+}
+
+.footer a:hover {
+    text-decoration: underline;
+}
+
+.dot {
+    font-size: 8px;
+    line-height: 1;
+} 
