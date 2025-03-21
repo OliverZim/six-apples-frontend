@@ -143,29 +143,87 @@ function addAccessNetworkLayer(map: Map, selectedPath: Path, queryPoints: QueryP
     map.addLayer(layer)
 }
 
-function getRandomColor() {
-    const letters = '0123456789ABCDEF';
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
+function getColorForSurfaceType(surfaceType: string): string {
+    switch (surfaceType) {
+        case 'asphalt':
+            return '#000000'; // black
+        case 'unpaved':
+            return '#D2B48C'; // tan
+        case 'paved':
+            return '#C0C0C0'; // silver
+        case 'concrete':
+            return '#808080'; // gray
+        case 'paving_stones':
+            return '#A52A2A'; // brown
+        case 'ground':
+            return '#DEB887'; // burlywood
+        case 'gravel':
+            return '#8B4513'; // saddle brown
+        case 'dirt':
+            return '#A0522D'; // sienna
+        case 'grass':
+            return '#008000'; // green
+        case 'compacted':
+            return '#D2691E'; // chocolate
+        case 'sand':
+            return '#FFD700'; // gold
+        case 'sett':
+            return '#708090'; // slate gray
+        case 'fine_gravel':
+            return '#CD853F'; // peru
+        case 'wood':
+            return '#A0522D'; // sienna
+        case 'concrete:plates':
+            return '#B0C4DE'; // light steel blue
+        case 'earth':
+            return '#8B4513'; // saddle brown
+        case 'cobblestone':
+            return '#2F4F4F'; // dark slate gray
+        case 'pebblestone':
+            return '#BC8F8F'; // rosy brown
+        case 'grass_paver':
+            return '#32CD32'; // lime green
+        case 'metal':
+            return '#B0C4DE'; // light steel blue
+        case 'artificial_turf':
+            return '#7CFC00'; // lawn green
+        case 'tartan':
+            return '#FF4500'; // orange red
+        case 'unhewn_cobblestone':
+            return '#696969'; // dim gray
+        default:
+            return '#FF0000'; // red
     }
-    return color;
 }
 
+type Surface = [number, number, string];
+
 function addSelectedPathsLayer(map: Map, selectedPath: Path) {
-    console.log(selectedPath.points.coordinates);
-    
     const segments = selectedPath.points.coordinates;
     const features: Feature<Geometry>[] = [];
     const styles: Style[] = [];
+
+    // Remove existing layer with the key 'selectedPathLayerKey'
+    const existingLayer = map.getLayers().getArray().find(layer => layer.get('selectedPathLayerKey'));
+    if (existingLayer) {
+        map.removeLayer(existingLayer);
+    }
+
+    // store the surface type for each segment in a list
+    const surface = ((selectedPath.details as any).surface as Surface[]) //.surface.map(s => s.surface);
+    const wrapped_surface = surface ? surface :  [[ 0, 2, "missing"] as Surface];
+
+    const newList = wrapped_surface.flatMap(([begin, end, surface]) =>
+        Array(end - begin).fill(surface)
+      );
+
 
     for (let i = 0; i < segments.length - 1; i++) {
         const start = fromLonLat(segments[i]);
         const end = fromLonLat(segments[i + 1]);
         const lineFeature = new Feature(new LineString([start, end]));
         features.push(lineFeature);
-
-        const color = getRandomColor();
+        const color = getColorForSurfaceType(newList[i]);
         const style = new Style({
             stroke: new Stroke({
                 color: color,
@@ -188,17 +246,9 @@ function addSelectedPathsLayer(map: Map, selectedPath: Path) {
         }),
     });
 
-    // for all the features in the feature list - print the type
-    features.forEach(f => {
-        const geometry = f.getGeometry();
-        if (geometry) {
-            console.log(geometry.getType());
-        }
-    });
-
     const layer = new VectorLayer({
         source: new VectorSource({
-            features: [...features, ...pointFeatures],
+            features: [...features] //, ...pointFeatures],
         }),
         style: (feature) => {
             if (feature.getGeometry() instanceof Point) {
