@@ -116,7 +116,7 @@ export default function App() {
     usePathsLayer(map, route.routingResult.paths, route.selectedPath, query.queryPoints)
     useQueryPointsLayer(map, query.queryPoints)
     usePathDetailsLayer(map, pathDetails)
-    usePOIsLayer(map, pois)
+    // usePOIsLayer(map, pois)
 
     const isSmallScreen = useMediaQuery({ query: '(max-width: 44rem)' })
     return (
