@@ -34,7 +34,7 @@ export const getClosestStreetViewImage = async (lat: number, lng: number): Promi
     }
 };
 
-const getClosestImagesForWaypoints = async (waypoints: [number, number, number][]) => {
+export const getClosestImagesForWaypoints = async (waypoints: [number, number, number][]) => {
     const imageUrls: string[] = [];
     
     for (const waypoint of waypoints) {
