@@ -25,10 +25,10 @@ const accessNetworkLayerKey = 'accessNetworkLayer'
 export default function usePathsLayer(map: Map, paths: Path[], selectedPath: Path, queryPoints: QueryPoint[]) {
     useEffect(() => {
         removeCurrentPathLayers(map)
-        addUnselectedPathsLayer(
-            map,
-            paths.filter(p => p != selectedPath)
-        )
+        // addUnselectedPathsLayer(
+        //     map,
+        //     paths.filter(p => p != selectedPath)
+        // )
         addSelectedPathsLayer(map, selectedPath)
         addAccessNetworkLayer(map, selectedPath, queryPoints)
         return () => {
@@ -44,54 +44,54 @@ function removeCurrentPathLayers(map: Map) {
         .forEach(l => map.removeLayer(l))
 }
 
-function addUnselectedPathsLayer(map: Map, paths: Path[]) {
-    const styleArray = [
-        new Style({
-            stroke: new Stroke({
-                color: 'rgba(39,93,173,0.8)',
-                width: 6,
-            }),
-        }),
-        new Style({
-            stroke: new Stroke({
-                color: 'rgba(201,217,241,0.7)',
-                width: 4,
-            }),
-        }),
-    ]
-    const layer = new VectorLayer({
-        source: new VectorSource({
-            features: paths.map((path: Path, index) => {
-                const f = new Feature({
-                    index: index,
-                })
-                if (path.points?.coordinates)
-                    f.setGeometry(new LineString(path.points.coordinates.map(c => fromLonLat(c))))
-                return f
-            }),
-        }),
-        style: styleArray,
-        opacity: 0.7,
-        zIndex: 1,
-    })
-    layer.set(pathsLayerKey, true)
-    map.addLayer(layer)
+// function addUnselectedPathsLayer(map: Map, paths: Path[]) {
+//     const styleArray = [
+//         new Style({
+//             stroke: new Stroke({
+//                 color: 'rgba(39,93,173,0.8)',
+//                 width: 6,
+//             }),
+//         }),
+//         new Style({
+//             stroke: new Stroke({
+//                 color: 'rgba(201,217,241,0.7)',
+//                 width: 4,
+//             }),
+//         }),
+//     ]
+//     const layer = new VectorLayer({
+//         source: new VectorSource({
+//             features: paths.map((path: Path, index) => {
+//                 const f = new Feature({
+//                     index: index,
+//                 })
+//                 if (path.points?.coordinates)
+//                     f.setGeometry(new LineString(path.points.coordinates.map(c => fromLonLat(c))))
+//                 return f
+//             }),
+//         }),
+//         style: styleArray,
+//         opacity: 0.7,
+//         zIndex: 1,
+//     })
+//     layer.set(pathsLayerKey, true)
+//     map.addLayer(layer)
 
-    // select an alternative path if clicked
-    removeSelectPathInteractions(map)
-    const select = new Select({
-        condition: click,
-        layers: [layer],
-        style: null,
-        hitTolerance: 5,
-    })
-    select.on('select', (e: SelectEvent) => {
-        const index = e.selected[0].getProperties().index
-        Dispatcher.dispatch(new SetSelectedPath(paths[index]))
-    })
-    select.set('gh:select_path_interaction', true)
-    map.addInteraction(select)
-}
+//     // select an alternative path if clicked
+//     removeSelectPathInteractions(map)
+//     const select = new Select({
+//         condition: click,
+//         layers: [layer],
+//         style: null,
+//         hitTolerance: 5,
+//     })
+//     select.on('select', (e: SelectEvent) => {
+//         const index = e.selected[0].getProperties().index
+//         Dispatcher.dispatch(new SetSelectedPath(paths[index]))
+//     })
+//     select.set('gh:select_path_interaction', true)
+//     map.addInteraction(select)
+// }
 
 function createBezierLineString(start: number[], end: number[]): LineString {
     const bezierPoints = []
@@ -152,27 +152,28 @@ type SurfaceInfo = {
 let surfaceMap = new Map();
 surfaceMap.set('asphalt', { color: '#000000', url: 'https://wiki.openstreetmap.org/w/images/thumb/5/56/Surface_asphalt.jpg/200px-Surface_asphalt.jpg' });
 surfaceMap.set('unpaved', { color: '#D2B48C', url: 'https://wiki.openstreetmap.org/w/images/thumb/5/5e/Surface_unpaved.jpg/200px-Surface_unpaved.jpg' });
-surfaceMap.set('paved', { color: '#C0C0C0', url: 'https://wiki.openstreetmap.org/w/images/thumb/5/5f/Surface_paved.jpg/200px-Surface_paved.jpg' });
-surfaceMap.set('concrete', { color: '#808080', url: 'https://wiki.openstreetmap.org/w/images/thumb/3/3d/Surface_concrete.jpg/200px-Surface_concrete.jpg' });
-surfaceMap.set('paving_stones', { color: '#A52A2A', url: 'https://wiki.openstreetmap.org/w/images/thumb/2/2f/Surface_paving_stones.jpg/200px-Surface_paving_stones.jpg' });
-surfaceMap.set('ground', { color: '#DEB887', url: 'https://wiki.openstreetmap.org/w/images/thumb/4/4b/Surface_ground.jpg/200px-Surface_ground.jpg' });
-surfaceMap.set('gravel', { color: '#8B4513', url: 'https://wiki.openstreetmap.org/w/images/thumb/1/1b/Surface_gravel.jpg/200px-Surface_gravel.jpg' });
-surfaceMap.set('dirt', { color: '#A0522D', url: 'https://wiki.openstreetmap.org/w/images/thumb/2/2e/Surface_dirt.jpg/200px-Surface_dirt.jpg' });
-surfaceMap.set('grass', { color: '#008000', url: 'https://wiki.openstreetmap.org/w/images/thumb/6/6e/Surface_grass.jpg/200px-Surface_grass.jpg' });
-surfaceMap.set('compacted', { color: '#D2691E', url: 'https://wiki.openstreetmap.org/w/images/thumb/5/5e/Surface_compacted.jpg/200px-Surface_compacted.jpg' });
-surfaceMap.set('sand', { color: '#FFD700', url: 'https://wiki.openstreetmap.org/w/images/thumb/7/70/Surface_sand.jpg/200px-Surface_sand.jpg' });
-surfaceMap.set('sett', { color: '#708090', url: 'https://wiki.openstreetmap.org/w/images/thumb/8/8b/Surface_sett.jpg/200px-Surface_sett.jpg' });
-surfaceMap.set('fine_gravel', { color: '#CD853F', url: 'https://wiki.openstreetmap.org/w/images/thumb/3/3c/Surface_fine_gravel.jpg/200px-Surface_fine_gravel.jpg' });
-surfaceMap.set('wood', { color: '#A0522D', url: 'https://wiki.openstreetmap.org/w/images/thumb/6/6b/Surface_wood.jpg/200px-Surface_wood.jpg' });
-surfaceMap.set('concrete:plates', { color: '#B0C4DE', url: 'https://wiki.openstreetmap.org/w/images/thumb/9/9e/Surface_concrete_plates.jpg/200px-Surface_concrete_plates.jpg' });
-surfaceMap.set('earth', { color: '#8B4513', url: 'https://wiki.openstreetmap.org/w/images/thumb/2/2e/Surface_earth.jpg/200px-Surface_earth.jpg' });
+surfaceMap.set('paved', { color: '#C0C0C0', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Paved_mosaic.png/200px-Paved_mosaic.png' });
+surfaceMap.set('concrete', { color: '#808080', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Magallanes%2C_ruta_9%2C_2.jpg/200px-Magallanes%2C_ruta_9%2C_2.jpg' });
+surfaceMap.set('paving_stones', { color: '#A52A2A', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Mix_of_paving_stones_IMG_20200910_163455.jpg/200px-Mix_of_paving_stones_IMG_20200910_163455.jpg' });
+surfaceMap.set('ground', { color: '#DEB887', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Gfp-florida-big-shaols-state-park-forest-trail.jpg/200px-Gfp-florida-big-shaols-state-park-forest-trail.jpg' });
+surfaceMap.set('gravel', { color: '#8B4513', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/%C5%A0t%C4%9Brkov%C3%A1_cesta_u_Pl%C3%A1%C5%A1t%C3%ADku.jpg/200px-%C5%A0t%C4%9Brkov%C3%A1_cesta_u_Pl%C3%A1%C5%A1t%C3%ADku.jpg' });
+surfaceMap.set('dirt', { color: '#A0522D', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Rainy_dirt_road_on_the_Tibetan_Plateau.jpg/200px-Rainy_dirt_road_on_the_Tibetan_Plateau.jpg' });
+surfaceMap.set('grass', { color: '#008000', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Grass_path_on_field_20160719.jpg/200px-Grass_path_on_field_20160719.jpg' });
+surfaceMap.set('compacted', { color: '#D2691E', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Compacted_forest_track_no1.jpg/200px-Compacted_forest_track_no1.jpg' });
+surfaceMap.set('sand', { color: '#FFD700', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Sand_Way.jpg/200px-Sand_Way.jpg' });
+surfaceMap.set('sett', { color: '#708090', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Pflastersteine_1.jpg/100px-Pflastersteine_1.jpg' });
+surfaceMap.set('fine_gravel', { color: '#CD853F', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Fine_gravel_path_in_Voltino%2C_Zagreb.jpg/200px-Fine_gravel_path_in_Voltino%2C_Zagreb.jpg' });
+surfaceMap.set('wood', { color: '#A0522D', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Bridge-path-straight-wooden_%2824029070260%29.jpg/200px-Bridge-path-straight-wooden_%2824029070260%29.jpg' });
+surfaceMap.set('concrete:plates', { color: '#B0C4DE', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Bypass_road_made_of_big_concrete_plates.jpg/200px-Bypass_road_made_of_big_concrete_plates.jpg' });
+surfaceMap.set('earth', { color: '#8B4513', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Rainy_dirt_road_on_the_Tibetan_Plateau.jpg/200px-Rainy_dirt_road_on_the_Tibetan_Plateau.jpg' });
 surfaceMap.set('cobblestone', { color: '#2F4F4F', url: 'https://wiki.openstreetmap.org/w/images/thumb/1/1e/Surface_cobblestone.jpg/200px-Surface_cobblestone.jpg' });
-surfaceMap.set('pebblestone', { color: '#BC8F8F', url: 'https://wiki.openstreetmap.org/w/images/thumb/8/8b/Surface_pebblestone.jpg/200px-Surface_pebblestone.jpg' });
-surfaceMap.set('grass_paver', { color: '#32CD32', url: 'https://wiki.openstreetmap.org/w/images/thumb/6/6e/Surface_grass_paver.jpg/200px-Surface_grass_paver.jpg' });
-surfaceMap.set('metal', { color: '#B0C4DE', url: 'https://wiki.openstreetmap.org/w/images/thumb/1/1a/Surface_metal.jpg/200px-Surface_metal.jpg' });
-surfaceMap.set('artificial_turf', { color: '#7CFC00', url: 'https://wiki.openstreetmap.org/w/images/thumb/4/45/Surface_artificial_turf.jpg/200px-Surface_artificial_turf.jpg' });
-surfaceMap.set('tartan', { color: '#FF4500', url: 'https://wiki.openstreetmap.org/w/images/thumb/3/3e/Surface_tartan.jpg/200px-Surface_tartan.jpg' });
-surfaceMap.set('unhewn_cobblestone', { color: '#696969', url: 'https://wiki.openstreetmap.org/w/images/thumb/9/9b/Surface_unhewn_cobblestone.jpg/200px-Surface_unhewn_cobblestone.jpg' });
+surfaceMap.set('pebblestone', { color: '#BC8F8F', url: 'https://wiki.openstreetmap.org/w/images/thumb/8/86/Dscf1829-800.jpg/200px-Dscf1829-800.jpg' });
+surfaceMap.set('grass_paver', { color: '#32CD32', url: 'https://wiki.openstreetmap.org/w/images/thumb/3/3d/Dscf1611-800.jpg/200px-Dscf1611-800.jpg' });
+surfaceMap.set('metal', { color: '#B0C4DE', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Tread_chrome_metal.jpg/200px-Tread_chrome_metal.jpg' });
+surfaceMap.set('artificial_turf', { color: '#7CFC00', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Kunstgress.JPG/200px-Kunstgress.JPG' });
+surfaceMap.set('tartan', { color: '#FF4500', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/All-weather_running_track.jpg/200px-All-weather_running_track.jpg' });
+surfaceMap.set('sand', { color: '#FFD700', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Sand_Way.jpg/200px-Sand_Way.jpg' });
+
 
 function getSurfaceUrl(surfaceType: string): string {
     if (surfaceMap.get(surfaceType) != undefined) {
@@ -205,6 +206,11 @@ function addSelectedPathsLayer(map: Map, selectedPath: Path) {
     const existingLayer = map.getLayers().getArray().find(layer => layer.get('selectedPathLayerKey'));
     if (existingLayer) {
         map.removeLayer(existingLayer);
+        map.getOverlays().getArray().forEach(overlay => {
+            if(overlay.getElement()?.classList.contains('ol-popup')) {
+                map.removeOverlay(overlay);
+            }
+        });
     }
 
     // store the surface type for each segment in a list
@@ -285,7 +291,7 @@ function addSelectedPathsLayer(map: Map, selectedPath: Path) {
 
                 // Show popup with image and surface type
                 popupElement.innerHTML = `
-                <img src="${getSurfaceUrl(surfaceType)}, alt="Surface Image"/>
+                <img src="${getSurfaceUrl(surfaceType)}", alt="Surface Image"/>
                 <div>${surfaceType}</div>
             `;
                 popup.setPosition(e.coordinate);
