@@ -41,6 +41,7 @@ export interface QueryStoreState {
     readonly routingProfile: RoutingProfile
     readonly customModelEnabled: boolean
     readonly customModelStr: string
+    readonly test: boolean
 }
 
 export interface QueryPoint {
@@ -113,6 +114,7 @@ export default class QueryStore extends Store<QueryStoreState> {
             },
             customModelEnabled: customModelEnabledInitially,
             customModelStr: initialCustomModelStr,
+            test: false,
         }
     }
 
@@ -303,6 +305,7 @@ export default class QueryStore extends Store<QueryStoreState> {
     }
 
     private routeIfReady(state: QueryStoreState, zoom: boolean): QueryStoreState {
+        console.log(`test: ${state.test}`)
         if (QueryStore.isReadyToRoute(state)) {
             let requests
             const maxDistance = getMaxDistance(state.queryPoints)
