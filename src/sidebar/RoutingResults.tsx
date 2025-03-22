@@ -66,6 +66,7 @@ function RoutingResult({
     const [descriptionRH, setDescriptionRH] = useState('')
     const [showStepsModal, setShowStepsModal] = useState(false)
     const [stepsImageUrl, setStepsImageUrl] = useState<string>("")
+    const [imageError, setImageError] = useState(false)
     const resultSummaryClass = isSelected
         ? styles.resultSummary + ' ' + styles.selectedResultSummary
         : styles.resultSummary
@@ -129,6 +130,7 @@ function RoutingResult({
                 const firstPoint = firstSegment[0]
                 const imageUrl = await getClosestStreetViewImage(firstPoint.lng, firstPoint.lat)
                 setStepsImageUrl(imageUrl)
+                setImageError(false)
                 setShowStepsModal(true)
             }
         }
@@ -318,15 +320,17 @@ function RoutingResult({
                 <div className={styles.modalOverlay} onClick={() => setShowStepsModal(false)}>
                     <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
                         <h2 className={styles.modalTitle}>Steps Preview</h2>
-                        <img 
-                            src={stepsImageUrl} 
-                            alt="Street View of Steps" 
-                            onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.src = 'placeholder-image-url.jpg';
-                                target.alt = 'Street View not available';
-                            }}
-                        />
+                        {!imageError ? (
+                            <img 
+                                src={stepsImageUrl} 
+                                alt="Street View of Steps"
+                                onError={() => setImageError(true)}
+                            />
+                        ) : (
+                            <div className={styles.noImagePlaceholder}>
+                                <p>Street View image not available for this location</p>
+                            </div>
+                        )}
                         <div className={styles.modalButtons}>
                             <button onClick={() => setShowStepsModal(false)}>Close</button>
                             <button onClick={() => {
