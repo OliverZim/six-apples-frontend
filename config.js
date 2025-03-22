@@ -23,12 +23,9 @@ const config = {
         details: [
             'road_class',
             'road_environment',
-            'road_access',
             'surface',
             'max_speed',
             'average_speed',
-            'toll',
-            'track_type',
             'country',
         ],
     },

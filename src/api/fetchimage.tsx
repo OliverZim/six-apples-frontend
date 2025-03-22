@@ -15,7 +15,7 @@ const waypoints: [number, number, number][] = [
   ];
 
 export const getClosestStreetViewImage = async (lat: number, lng: number): Promise<string> => {
-    const radius = 45; // Increase the radius to 50 meters
+    const radius = 10; // Increase the radius to 50 meters
     const url = `https://maps.googleapis.com/maps/api/streetview/metadata?location=${lng},${lat}&radius=${radius}&key=${API_KEY}`;
     
     try {
