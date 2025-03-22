@@ -5,6 +5,14 @@ export interface User {
     id: number;
     username: string;
     email: string;
+    preferences?: UserPreferences | null;
+}
+
+export interface UserPreferences {
+    difficulty: string;
+    maxSlope: number;
+    avoidStairs: boolean;
+    preferElevators: boolean;
 }
 
 interface DBUser {
@@ -12,7 +20,6 @@ interface DBUser {
     username: string;
     email: string;
     password_hash: string;
-    created_at: string;
 }
 
 export interface AuthResponse {
@@ -24,18 +31,59 @@ export interface AuthResponse {
 export class AuthService {
     static async findUserByEmail(email: string): Promise<User | null> {
         return new Promise((resolve, reject) => {
-            db.get<DBUser>('SELECT id, username, email FROM users WHERE email = ?', [email], (err, row) => {
+            db.get<DBUser>('SELECT id, username, email FROM users WHERE email = ?', [email], async (err, row) => {
+                if (err) reject(err);
+                if (!row) {
+                    resolve(null);
+                    return;
+                }
+                const preferences = await this.getUserPreferences(row.id);
+                resolve({
+                    id: row.id,
+                    username: row.username,
+                    email: row.email,
+                    preferences
+                });
+            });
+        });
+    }
+
+    static async getUserPreferences(userId: number): Promise<UserPreferences | null> {
+        return new Promise((resolve, reject) => {
+            db.get('SELECT * FROM user_preferences WHERE user_id = ?', [userId], (err, row: any) => {
                 if (err) reject(err);
                 if (!row) {
                     resolve(null);
                     return;
                 }
                 resolve({
-                    id: row.id,
-                    username: row.username,
-                    email: row.email
+                    difficulty: row.difficulty,
+                    maxSlope: row.max_slope,
+                    avoidStairs: Boolean(row.avoid_stairs),
+                    preferElevators: Boolean(row.prefer_elevators)
                 });
             });
+        });
+    }
+
+    static async saveUserPreferences(userId: number, preferences: UserPreferences): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(
+                `INSERT OR REPLACE INTO user_preferences 
+                (user_id, difficulty, max_slope, avoid_stairs, prefer_elevators) 
+                VALUES (?, ?, ?, ?, ?)`,
+                [
+                    userId,
+                    preferences.difficulty,
+                    preferences.maxSlope,
+                    preferences.avoidStairs ? 1 : 0,
+                    preferences.preferElevators ? 1 : 0
+                ],
+                (err) => {
+                    if (err) reject(err);
+                    resolve(true);
+                }
+            );
         });
     }
 
@@ -105,12 +153,14 @@ export class AuthService {
                             return;
                         }
 
+                        const preferences = await this.getUserPreferences(user.id);
                         resolve({
                             success: true,
                             user: {
                                 id: user.id,
                                 username: user.username,
-                                email: user.email
+                                email: user.email,
+                                preferences
                             }
                         });
                     }

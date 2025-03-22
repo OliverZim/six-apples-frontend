@@ -1,7 +1,7 @@
 import express from 'express';
 import session from 'express-session';
 import cors from 'cors';
-import { AuthService } from './services/auth';
+import { AuthService, UserPreferences } from './services/auth';
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -19,6 +19,7 @@ app.use(session({
     saveUninitialized: false,
     cookie: {
         secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000 // 24 hours
     }
 }));
@@ -69,6 +70,26 @@ app.post('/api/auth/login', async (req, res) => {
         }
     } catch (error) {
         console.error('Login error:', error);
+        return res.status(500).json({ success: false, error: 'Server error' });
+    }
+});
+
+app.post('/api/auth/preferences', async (req, res) => {
+    if (!req.session.userId) {
+        return res.status(401).json({ success: false, error: 'Not authenticated' });
+    }
+
+    const preferences: UserPreferences = req.body;
+    
+    try {
+        const success = await AuthService.saveUserPreferences(req.session.userId, preferences);
+        if (success) {
+            return res.json({ success: true });
+        } else {
+            return res.status(500).json({ success: false, error: 'Failed to save preferences' });
+        }
+    } catch (error) {
+        console.error('Save preferences error:', error);
         return res.status(500).json({ success: false, error: 'Server error' });
     }
 });
