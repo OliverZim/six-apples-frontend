@@ -193,6 +193,20 @@ function getSurfaceColor(surfaceType: string): string {
     }
 }
 
+// Add new function to get a formatted surface name
+function getFormattedSurfaceName(surfaceType: string): string {
+    if (!surfaceType) return "Unknown";
+    
+    // Replace underscores with spaces and capitalize each word
+    return surfaceType
+        .split('_')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ')
+        .split(':')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+}
+
 type Surface = [number, number, string];
 
 type SpecialFeature = Feature<Geometry> & { surfaceType: string };
@@ -289,10 +303,10 @@ function addSelectedPathsLayer(map: Map, selectedPath: Path) {
                 const surfaceType = (feature as SpecialFeature).surfaceType;
                 console.log("Feature clicked", surfaceType);
 
-                // Show popup with image and surface type
+                // Show popup with image and formatted surface type
                 popupElement.innerHTML = `
                 <img src="${getSurfaceUrl(surfaceType)}", alt=""/>
-                <div>${surfaceType}</div>
+                <div>${getFormattedSurfaceName(surfaceType)}</div>
             `;
                 popup.setPosition(e.coordinate);
             }
