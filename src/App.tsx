@@ -262,9 +262,6 @@ function SmallScreenLayout({ query, route, map, error, mapOptions, encodedValues
                 />
             </div>
 
-            <div className={styles.smallScreenPoweredBy}>
-                <PoweredBy />
-            </div>
         </>
     )
 }

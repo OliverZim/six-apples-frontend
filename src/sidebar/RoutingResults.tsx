@@ -76,46 +76,27 @@ function RoutingResult({
     )
     const ferryInfo = getInfoFor(path.points, path.details.road_environment, s => s === 'ferry')
     const accessCondInfo = getInfoFor(path.points, path.details.access_conditional, s => s != null && s.length > 0)
-    const footAccessCondInfo = !ApiImpl.isFootLike(profile)
-        ? new RouteInfo()
-        : getInfoFor(path.points, path.details.foot_conditional, s => s != null && s.length > 0)
-    const hikeRatingInfo = !ApiImpl.isFootLike(profile)
-        ? new RouteInfo()
-        : getInfoFor(path.points, path.details.hike_rating, s => s > 1)
+    const footAccessCondInfo = getInfoFor(path.points, path.details.foot_conditional, s => s != null && s.length > 0)
+    const hikeRatingInfo = getInfoFor(path.points, path.details.hike_rating, s => s > 1)
 
-    const bikeAccessCondInfo = !ApiImpl.isBikeLike(profile)
-        ? new RouteInfo()
-        : getInfoFor(path.points, path.details.bike_conditional, s => s != null && s.length > 0)
-    const mtbRatingInfo = !ApiImpl.isBikeLike(profile)
-        ? new RouteInfo()
-        : getInfoFor(path.points, path.details.mtb_rating, s => s > 1)
+    const bikeAccessCondInfo = getInfoFor(path.points, path.details.bike_conditional, s => s != null && s.length > 0)
+    const mtbRatingInfo = getInfoFor(path.points, path.details.mtb_rating, s => s > 1)
 
-    const privateOrDeliveryInfo = ApiImpl.isMotorVehicle(profile)
-        ? getInfoFor(
+    const privateOrDeliveryInfo = getInfoFor(
               path.points,
               path.details.road_access,
               s => s === 'private' || s === 'customers' || s === 'delivery'
           )
-        : new RouteInfo()
-    const badTrackInfo = !ApiImpl.isMotorVehicle(profile)
-        ? new RouteInfo()
-        : getInfoFor(
+
+    const badTrackInfo = getInfoFor(
               path.points,
               path.details.track_type,
               s => s === 'grade2' || s === 'grade3' || s === 'grade4' || s === 'grade5'
           )
-    const trunkInfo = ApiImpl.isMotorVehicle(profile)
-        ? new RouteInfo()
-        : getInfoFor(path.points, path.details.road_class, s => s === 'motorway' || s === 'trunk')
-    const stepsInfo = !ApiImpl.isBikeLike(profile)
-        ? new RouteInfo()
-        : getInfoFor(path.points, path.details.road_class, s => s === 'steps')
-    const steepInfo = ApiImpl.isMotorVehicle(profile)
-        ? new RouteInfo()
-        : getHighSlopeInfo(path.points, 15, showDistanceInMiles)
-    const getOffBikeInfo = !ApiImpl.isBikeLike(profile)
-        ? new RouteInfo()
-        : getInfoFor(path.points, path.details.get_off_bike, s => s)
+    const trunkInfo = getInfoFor(path.points, path.details.road_class, s => s === 'motorway' || s === 'trunk')
+    const stepsInfo = getInfoFor(path.points, path.details.road_class, s => s === 'steps')
+    const steepInfo = getHighSlopeInfo(path.points, 15, showDistanceInMiles)
+    const getOffBikeInfo = getInfoFor(path.points, path.details.get_off_bike, s => s)
     const borderInfo = crossesBorderInfo(path.points, path.details.country)
 
     const showHints =

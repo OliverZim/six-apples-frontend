@@ -45,23 +45,6 @@ export default function Search({ points, map }: { points: QueryPoint[]; map: Map
                     />
                 ))}
             </div>
-            <div className={styles.lastSearchLine}>
-                <PlainButton
-                    style={
-                        showTargetIcons && moveStartIndex >= 0 && moveStartIndex + 1 < points.length
-                            ? { paddingTop: '2rem' }
-                            : {}
-                    }
-                    onClick={() => Dispatcher.dispatch(new AddPoint(points.length, { lat: 0, lng: 0 }, false, true))}
-                    className={styles.addSearchBox}
-                >
-                    <AddIcon />
-                    <div>{tr('add_to_route')}</div>
-                </PlainButton>
-                <PlainButton className={styles.settingsButton} onClick={() => setShowSettings(!showSettings)}>
-                    {showSettings ? tr('settings_close') : tr('settings')}
-                </PlainButton>
-            </div>
             {showSettings && <SettingsBox />}
         </div>
     )
