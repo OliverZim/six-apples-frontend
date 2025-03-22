@@ -31,6 +31,7 @@ import { SettingsContext } from '@/contexts/SettingsContext'
 import { Settings } from '@/stores/SettingsStore'
 import { RouteStoreState } from '@/stores/RouteStore'
 import { getClosestStreetViewImage } from '@/api/fetchimage'
+
 export interface RoutingResultsProps {
     info: RoutingResultInfo
     paths: Path[]
