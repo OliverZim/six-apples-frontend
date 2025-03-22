@@ -22,6 +22,11 @@ export default function ProfileSelection({ profiles, selectedProfile, isOpen, on
         if (!icons[p.name]) customProfiles[key] = [...(customProfiles[key] || []), p.name]
     })
 
+
+    // exclude the "negative" profile
+    profiles = profiles.filter(p => p.name !== 'negative' && p.name !== 'wheelchair_automatic');
+    
+
     const handleProfileSelect = (profile: RoutingProfile) => {
         Dispatcher.dispatch(new SetVehicleProfile(profile))
         onClose()
