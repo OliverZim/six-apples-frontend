@@ -206,9 +206,9 @@ function LargeScreenLayout({ query, route, map, error, mapOptions, encodedValues
                             profile={query.routingProfile.name}
                             route={route}
                         />
-                        <div>
+                        {/* <div>
                             <PoweredBy />
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             ) : (
