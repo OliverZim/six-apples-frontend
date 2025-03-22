@@ -12,7 +12,9 @@ app.use(cors({
     origin: [
         'http://localhost:3000',
         'https://sister-carb-capability-ie.trycloudflare.com',
-        'https://carries-sick-seas-oklahoma.trycloudflare.com'
+        'https://carries-sick-seas-oklahoma.trycloudflare.com',
+        'https://six-apples.dieprogrammi.de',
+        'https://six-apples-backend.dieprogrammi.de'
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
