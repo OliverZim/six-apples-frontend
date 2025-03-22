@@ -69,6 +69,7 @@ function RoutingResult({
     const [descriptionRH, setDescriptionRH] = useState('')
     const [showStepsModal, setShowStepsModal] = useState(false)
     const [StepsFirstPoint, setStepsFirstPoint] = useState<Coordinate | null>(null)
+    const [pointsToExclude, setPointsToExclude] = useState<Coordinate[]>([])
     const [stepsImageUrl, setStepsImageUrl] = useState<string>("")
     const [imageError, setImageError] = useState(false)
     const resultSummaryClass = isSelected
@@ -94,16 +95,16 @@ function RoutingResult({
     const mtbRatingInfo = getInfoFor(path.points, path.details.mtb_rating, s => s > 1)
 
     const privateOrDeliveryInfo = getInfoFor(
-              path.points,
-              path.details.road_access,
-              s => s === 'private' || s === 'customers' || s === 'delivery'
-          )
+        path.points,
+        path.details.road_access,
+        s => s === 'private' || s === 'customers' || s === 'delivery'
+    )
 
     const badTrackInfo = getInfoFor(
-              path.points,
-              path.details.track_type,
-              s => s === 'grade2' || s === 'grade3' || s === 'grade4' || s === 'grade5'
-          )
+        path.points,
+        path.details.track_type,
+        s => s === 'grade2' || s === 'grade3' || s === 'grade4' || s === 'grade5'
+    )
     const trunkInfo = getInfoFor(path.points, path.details.road_class, s => s === 'motorway' || s === 'trunk')
     const stepsInfo = getInfoFor(path.points, path.details.road_class, s => s === 'steps')
     const steepInfo = getHighSlopeInfo(path.points, 15, showDistanceInMiles)
@@ -127,51 +128,73 @@ function RoutingResult({
         hikeRatingInfo.distance > 0 ||
         steepInfo.distance > 0
 
-        function SkipObStacle() {
-            // Define constants here
-            const MIN_MULTIPLIER = 0
-            const BUFFER = 0.0004  // Using a slightly larger buffer for better coverage
-            const DEFAULT_LONGITUDE = StepsFirstPoint ? StepsFirstPoint.lng - BUFFER : 13.362122
-            const ALT_LONGITUDE = StepsFirstPoint ? StepsFirstPoint.lng + BUFFER : 13.447952  
-            const DEFAULT_LATITUDE = StepsFirstPoint ? StepsFirstPoint.lat - BUFFER : 52.493029
-            const ALT_LATITUDE = StepsFirstPoint ? StepsFirstPoint.lat + BUFFER : 52.530221
-        
-            const customModelText = `{
-          "priority": [
-            {
-              "if": "in_area1",
-              "multiply_by": "${MIN_MULTIPLIER}"
-            }
-          ],
-          "areas": {
-            "type": "FeatureCollection",
-            "features": [
-              {
-                "id": "area1",
-                "properties": {},
-                "type": "Feature",
-                "geometry": {
-                  "type": "Polygon",
-                  "coordinates": [
-                    [
-                      [${DEFAULT_LONGITUDE}, ${DEFAULT_LATITUDE}],
-                      [${ALT_LONGITUDE}, ${DEFAULT_LATITUDE}],
-                      [${ALT_LONGITUDE}, ${ALT_LATITUDE}],
-                      [${DEFAULT_LONGITUDE}, ${ALT_LATITUDE}],
-                      [${DEFAULT_LONGITUDE}, ${DEFAULT_LATITUDE}]
-                    ]
-                  ]
-                }
-              }
-            ]
-          }
-        }`
-        
-            // Use Dispatcher.dispatch directly
-            Dispatcher.dispatch(new SetCustomModel(customModelText, true))
-            Dispatcher.dispatch(new SetCustomModelEnabled(true))
+
+    const EXCLUDE_AREA = 30 // meter
+    const EXCLUDE_AREA_LAT = 8.98311174991017e-06 * EXCLUDE_AREA
+    const EXCLUDE_AREA_LON = 1.4763165177199368e-05 * EXCLUDE_AREA
+
+    function SkipObStacle() {
+        const customModelText = getCustomModel(pointsToExclude)
+
+        // Use Dispatcher.dispatch directly
+        Dispatcher.dispatch(new SetCustomModel(customModelText, true))
+        Dispatcher.dispatch(new SetCustomModelEnabled(true))
+    }
+
+    function getCustomModel(excludePoints: Coordinate[]): string {
+        let priority: any = [];
+        let areas: any = [];
+
+        for (let i = 0; i < excludePoints.length; i++) {
+            let id = `area${i}`;
+            areas.push({ point: [excludePoints[i].lat, excludePoints[i].lng], id: id });
+            priority.push(priorityJSON(`in_${id}`, 0));
         }
-        
+
+        const obj = {
+            priority: priority,
+            areas: areaJSON(areas)
+        }
+        return JSON.stringify(obj)
+    }
+
+    function areaJSON(areas: { point: [number, number], id: string }[]) {
+        let features: any = [];
+        for (let area of areas) {
+            const lat = area.point[0];
+            const lon = area.point[1];
+            features.push({
+                "type": "Feature",
+                "id": area.id,
+                "properties": {},
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [
+                        [
+                            [lon - EXCLUDE_AREA_LON / 2, lat - EXCLUDE_AREA_LAT / 2 ],
+                            [lon - EXCLUDE_AREA_LON / 2, lat + EXCLUDE_AREA_LAT / 2 ],
+                            [lon + EXCLUDE_AREA_LON / 2, lat + EXCLUDE_AREA_LAT / 2 ],
+                            [lon + EXCLUDE_AREA_LON / 2, lat - EXCLUDE_AREA_LAT / 2 ],
+                            [lon - EXCLUDE_AREA_LON / 2, lat - EXCLUDE_AREA_LAT / 2 ]
+                        ]
+                    ]
+                }
+            })
+        }
+        return {
+            "type": "FeatureCollection",
+            "features": features
+        }
+    }
+
+
+    function priorityJSON(condition: string, speed: number) {
+        return {
+            "if": condition,
+            "multiply_by": `${speed}`
+        }
+    }
+
     const handleStepsClick = async (segments: Coordinate[][]) => {
         if (segments && segments.length > 0) {
             const firstSegment = segments[0]
@@ -181,7 +204,9 @@ function RoutingResult({
                 setStepsImageUrl(imageUrl)
                 setImageError(false)
                 setShowStepsModal(true)
-                setStepsFirstPoint(firstPoint);
+                setPointsToExclude(pointsToExclude.concat([firstPoint]))
+                console.log(pointsToExclude)
+                // setStepsFirstPoint(firstPoint);
             }
         }
     }
@@ -366,33 +391,33 @@ function RoutingResult({
                             onClick={() => handleStepsClick(stepsInfo.segments)}
                         />
 
-            {showStepsModal && (
-                <div className={styles.modalOverlay} onClick={() => setShowStepsModal(false)}>
-                    <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
-                        <h2 className={styles.modalTitle}>Steps Preview</h2>
-                        {!imageError ? (
-                            <img 
-                                src={stepsImageUrl} 
-                                alt="Street View of Steps"
-                                onError={() => setImageError(true)}
-                            />
-                        ) : (
-                            <div className={styles.noImagePlaceholder}>
-                                <p>Street View image not available for this location</p>
+                        {showStepsModal && (
+                            <div className={styles.modalOverlay} onClick={() => setShowStepsModal(false)}>
+                                <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+                                    <h2 className={styles.modalTitle}>Steps Preview</h2>
+                                    {!imageError ? (
+                                        <img
+                                            src={stepsImageUrl}
+                                            alt="Street View of Steps"
+                                            onError={() => setImageError(true)}
+                                        />
+                                    ) : (
+                                        <div className={styles.noImagePlaceholder}>
+                                            <p>Street View image not available for this location</p>
+                                        </div>
+                                    )}
+                                    <div className={styles.modalButtons}>
+                                        <button onClick={() => setShowStepsModal(false)}>Close</button>
+                                        <button onClick={() => {
+                                            setShowStepsModal(false);
+                                            // Skip this obstacle by calling the SkipObStacle function
+                                            SkipObStacle();
+                                        }}>Skip this obstacle</button>
+                                    </div>
+                                </div>
                             </div>
                         )}
-                        <div className={styles.modalButtons}>
-                            <button onClick={() => setShowStepsModal(false)}>Close</button>
-                            <button onClick={() => {
-                                setShowStepsModal(false);
-                                // Skip this obstacle by calling the SkipObStacle function
-                                SkipObStacle();
-                            }}>Skip this obstacle</button>
-                        </div>
-                    </div>
-                </div>
-            )}
-            
+
                         <RHButton
                             setDescription={b => setDescriptionRH(b)}
                             description={tr('way_contains', [tr('tracks')])}
@@ -647,7 +672,7 @@ function getLength(paths: Path[], subRequests: SubRequest[]) {
 
 function createSingletonListContent(props: RoutingResultsProps) {
     if (props.paths.length > 0)
-        return <RoutingResult path={props.selectedPath} isSelected={true} profile={props.profile} info={props.info} route={props.route}/>
+        return <RoutingResult path={props.selectedPath} isSelected={true} profile={props.profile} info={props.info} route={props.route} />
     if (hasPendingRequests(props.currentRequest.subRequests)) return <RoutingResultPlaceholder key={1} />
     return ''
 }

@@ -90,7 +90,7 @@ const omniscale: RasterStyle = {
 const esriSatellite: RasterStyle = {
     name: 'Satellite',
     type: 'raster',
-    url: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
+    url: ['https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', 'https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}'],
     attribution:
         '&copy; <a href="http://www.esri.com/" target="_blank">Esri</a>' +
         ' i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
