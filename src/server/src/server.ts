@@ -14,7 +14,8 @@ app.use(cors({
         'https://sister-carb-capability-ie.trycloudflare.com',
         'https://carries-sick-seas-oklahoma.trycloudflare.com',
         'https://six-apples.dieprogrammi.de',
-        'https://six-apples-backend.dieprogrammi.de'
+        'https://six-apples-backend.dieprogrammi.de',
+        'https://six-apples-db.dieprogrammi.de/api/auth'
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
