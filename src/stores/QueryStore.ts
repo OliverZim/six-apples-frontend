@@ -22,6 +22,7 @@ import { Bbox, RoutingArgs, RoutingProfile } from '@/api/graphhopper'
 import { calcDist } from '@/distUtils'
 import config from 'config'
 import { customModel2prettyString, customModelExamples } from '@/sidebar/CustomModelExamples'
+import { Profiles } from '@/stores/profiles/profiles'
 
 export interface Coordinate {
     lat: number
@@ -41,7 +42,8 @@ export interface QueryStoreState {
     readonly routingProfile: RoutingProfile
     readonly customModelEnabled: boolean
     readonly customModelStr: string
-    readonly test: boolean
+    readonly selectedProfile: Profiles
+    readonly excludedPoints: [number, number][]
 }
 
 export interface QueryPoint {
@@ -114,7 +116,8 @@ export default class QueryStore extends Store<QueryStoreState> {
             },
             customModelEnabled: customModelEnabledInitially,
             customModelStr: initialCustomModelStr,
-            test: false,
+            selectedProfile: "prothesis",
+            excludedPoints: [],
         }
     }
 
@@ -305,7 +308,6 @@ export default class QueryStore extends Store<QueryStoreState> {
     }
 
     private routeIfReady(state: QueryStoreState, zoom: boolean): QueryStoreState {
-        console.log(`test: ${state.test}`)
         if (QueryStore.isReadyToRoute(state)) {
             let requests
             const maxDistance = getMaxDistance(state.queryPoints)
@@ -444,6 +446,10 @@ export default class QueryStore extends Store<QueryStoreState> {
             number,
             number
         ][]
+
+        /**
+         * Load custom models and avoid areas to exclude
+         */
 
         let customModel = null
         if (state.customModelEnabled)
