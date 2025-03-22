@@ -142,12 +142,6 @@ function RoutingResult({
                         )}
                     </div>
                     {isSelected && (
-                        <PlainButton className={styles.exportButton} onClick={() => downloadGPX(path, settings)}>
-                            <GPXDownload />
-                            <div>{tr('gpx_button')}</div>
-                        </PlainButton>
-                    )}
-                    {isSelected && (
                         <PlainButton
                             className={isExpanded ? styles.detailsButtonExpanded : styles.detailsButton}
                             onClick={() => setExpanded(!isExpanded)}
@@ -519,62 +513,6 @@ function getHighSlopeInfo(points: LineString, steepSlope: number, showDistanceIn
         segmentPoints.push(toCoordinate(currPoint))
     })
     return info
-}
-
-function downloadGPX(path: Path, settings: Settings) {
-    let xmlString =
-        '<?xml version="1.0" encoding="UTF-8" standalone="no" ?><gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" creator="GraphHopper" version="1.1" xmlns:gh="https://graphhopper.com/public/schema/gpx/1.1">\n'
-    xmlString += `<metadata><copyright author="OpenStreetMap contributors"/><link href="http://graphhopper.com"><text>GraphHopper GPX</text></link><time>${new Date().toISOString()}</time></metadata>\n`
-
-    const rte = settings.gpxExportRte
-    const wpt = settings.gpxExportWpt
-    const trk = settings.gpxExportTrk
-
-    if (wpt)
-        xmlString += path.snapped_waypoints.coordinates.reduce((prevString: string, coord: Position) => {
-            return prevString + `<wpt lat="${coord[1]}" lon="${coord[0]}"></wpt>\n`
-        }, '')
-
-    if (rte) {
-        xmlString += '<rte>\n'
-        xmlString += path.instructions.reduce((prevString: string, instruction: Instruction) => {
-            let routeSegment = `<rtept lat="${instruction.points[0][1].toFixed(
-                6
-            )}" lon="${instruction.points[0][0].toFixed(6)}">`
-            routeSegment += `<desc>${instruction.text}</desc><extensions><gh:distance>${instruction.distance}</gh:distance>`
-            routeSegment += `<gh:time>${instruction.time}</gh:time><gh:sign>${instruction.sign}</gh:sign>`
-            // TODO routeSegment += `<gh:direction>SW</gh:direction><gh:azimuth>222.57</gh:azimuth>` +
-            routeSegment += '</extensions></rtept>\n'
-            return prevString + routeSegment
-        }, '')
-        xmlString += '</rte>\n'
-    }
-
-    if (trk) {
-        xmlString += '<trk>\n<name>GraphHopper Track</name><desc></desc>\n<trkseg>'
-        // TODO include time via path.details.time
-        xmlString += path.points.coordinates.reduce((prevString, coord) => {
-            let trackPoint = '<trkpt '
-            trackPoint += `lat="${coord[1].toFixed(6)}" lon="${coord[0].toFixed(6)}">`
-            if (coord.length > 2) trackPoint += `<ele>${coord[2].toFixed(1)}</ele>`
-            trackPoint += '</trkpt>\n'
-            return prevString + trackPoint
-        }, '')
-        xmlString += '</trkseg></trk>\n</gpx>'
-    }
-
-    const tmpElement = document.createElement('a')
-    const file = new Blob([xmlString], { type: 'application/gpx+xml' })
-    tmpElement.href = URL.createObjectURL(file)
-    const date = new Date()
-    tmpElement.download = `GraphHopper-Track-${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(
-        date.getUTCDate()
-    )}-${metersToTextForFile(path.distance, settings.showDistanceInMiles)}.gpx`
-    tmpElement.click()
-}
-
-function pad(value: number) {
-    return value < 10 ? '0' + value : '' + value
 }
 
 function RoutingResultPlaceholder() {

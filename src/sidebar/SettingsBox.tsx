@@ -23,34 +23,6 @@ export default function SettingsBox() {
                     }
                 />
             </div>
-            <div className={styles.title}>{tr('settings_gpx_export')}</div>
-            <div className={styles.settingsTable}>
-                <div className={styles.settingsCheckboxes}>
-                    <SettingsCheckbox
-                        title={tr('settings_gpx_export_trk')}
-                        enabled={settings.gpxExportTrk}
-                        onClick={() =>
-                            Dispatcher.dispatch(new UpdateSettings({ gpxExportTrk: !settings.gpxExportTrk }))
-                        }
-                    />
-
-                    <SettingsCheckbox
-                        title={tr('settings_gpx_export_rte')}
-                        enabled={settings.gpxExportRte}
-                        onClick={() =>
-                            Dispatcher.dispatch(new UpdateSettings({ gpxExportRte: !settings.gpxExportRte }))
-                        }
-                    />
-
-                    <SettingsCheckbox
-                        title={tr('settings_gpx_export_wpt')}
-                        enabled={settings.gpxExportWpt}
-                        onClick={() =>
-                            Dispatcher.dispatch(new UpdateSettings({ gpxExportWpt: !settings.gpxExportWpt }))
-                        }
-                    />
-                </div>
-            </div>
             <div className={styles.infoLine}>
                 <a href="https://www.graphhopper.com/maps-route-planner/">{tr('info')}</a>
                 <a href="https://github.com/graphhopper/graphhopper-maps/issues">{tr('feedback')}</a>
