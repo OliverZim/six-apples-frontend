@@ -5,6 +5,14 @@ export interface User {
     id: number;
     username: string;
     email: string;
+    preferences?: UserPreferences;
+}
+
+export interface UserPreferences {
+    difficulty: 'no impairment' | 'crutches/walking stick' | 'prosthesis' | 'wheelchair';
+    age: number;
+    avoidStairs: boolean;
+    preferElevators: boolean;
 }
 
 interface DBUser {
@@ -12,7 +20,10 @@ interface DBUser {
     username: string;
     email: string;
     password_hash: string;
-    created_at: string;
+    difficulty?: string;
+    age?: number;
+    avoid_stairs?: number;
+    prefer_elevators?: number;
 }
 
 export interface AuthResponse {
@@ -24,18 +35,76 @@ export interface AuthResponse {
 export class AuthService {
     static async findUserByEmail(email: string): Promise<User | null> {
         return new Promise((resolve, reject) => {
-            db.get<DBUser>('SELECT id, username, email FROM users WHERE email = ?', [email], (err, row) => {
-                if (err) reject(err);
-                if (!row) {
-                    resolve(null);
-                    return;
+            db.get<DBUser>(
+                'SELECT id, username, email, difficulty, age, avoid_stairs, prefer_elevators FROM users WHERE email = ?',
+                [email],
+                (err, row) => {
+                    if (err) reject(err);
+                    if (!row) {
+                        resolve(null);
+                        return;
+                    }
+                    resolve({
+                        id: row.id,
+                        username: row.username,
+                        email: row.email,
+                        preferences: row.difficulty ? {
+                            difficulty: row.difficulty as UserPreferences['difficulty'],
+                            age: row.age || 30,
+                            avoidStairs: Boolean(row.avoid_stairs),
+                            preferElevators: Boolean(row.prefer_elevators)
+                        } : undefined
+                    });
                 }
-                resolve({
-                    id: row.id,
-                    username: row.username,
-                    email: row.email
-                });
-            });
+            );
+        });
+    }
+
+    static async findUserById(id: number): Promise<User | null> {
+        return new Promise((resolve, reject) => {
+            db.get<DBUser>(
+                'SELECT id, username, email, difficulty, age, avoid_stairs, prefer_elevators FROM users WHERE id = ?',
+                [id],
+                (err, row) => {
+                    if (err) reject(err);
+                    if (!row) {
+                        resolve(null);
+                        return;
+                    }
+                    resolve({
+                        id: row.id,
+                        username: row.username,
+                        email: row.email,
+                        preferences: row.difficulty ? {
+                            difficulty: row.difficulty as UserPreferences['difficulty'],
+                            age: row.age || 30,
+                            avoidStairs: Boolean(row.avoid_stairs),
+                            preferElevators: Boolean(row.prefer_elevators)
+                        } : undefined
+                    });
+                }
+            );
+        });
+    }
+
+    static async saveUserPreferences(userId: number, preferences: UserPreferences): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(
+                `UPDATE users 
+                SET difficulty = ?, age = ?, avoid_stairs = ?, prefer_elevators = ?
+                WHERE id = ?`,
+                [
+                    preferences.difficulty,
+                    preferences.age,
+                    preferences.avoidStairs ? 1 : 0,
+                    preferences.preferElevators ? 1 : 0,
+                    userId
+                ],
+                (err) => {
+                    if (err) reject(err);
+                    resolve(true);
+                }
+            );
         });
     }
 
@@ -105,13 +174,10 @@ export class AuthService {
                             return;
                         }
 
+                        const userWithPrefs = await this.findUserById(user.id);
                         resolve({
                             success: true,
-                            user: {
-                                id: user.id,
-                                username: user.username,
-                                email: user.email
-                            }
+                            user: userWithPrefs || undefined
                         });
                     }
                 );
@@ -122,19 +188,22 @@ export class AuthService {
         }
     }
 
-    static async findUserById(id: number): Promise<User | null> {
+    static async initializeDatabase(): Promise<void> {
         return new Promise((resolve, reject) => {
-            db.get<DBUser>('SELECT id, username, email FROM users WHERE id = ?', [id], (err, row) => {
+            db.run(`
+                CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    username TEXT UNIQUE NOT NULL,
+                    email TEXT UNIQUE NOT NULL,
+                    password_hash TEXT NOT NULL,
+                    difficulty TEXT,
+                    age INTEGER,
+                    avoid_stairs INTEGER DEFAULT 0,
+                    prefer_elevators INTEGER DEFAULT 0
+                )
+            `, (err) => {
                 if (err) reject(err);
-                if (!row) {
-                    resolve(null);
-                    return;
-                }
-                resolve({
-                    id: row.id,
-                    username: row.username,
-                    email: row.email
-                });
+                resolve();
             });
         });
     }
