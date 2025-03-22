@@ -192,6 +192,7 @@ export class ApiImpl implements Api {
     async route(args: RoutingArgs): Promise<RoutingResult> {
         const completeRequest = ApiImpl.createRequest(args)
 
+        console.log(completeRequest)
         const response = await fetch(this.getRoutingURLWithKey('route').toString(), {
             method: 'POST',
             mode: 'cors',
@@ -294,7 +295,6 @@ export class ApiImpl implements Api {
             request['ch.disable'] = true
             request['timeout_ms'] = 10000
         }
-
         if (
             args.points.length <= 2 &&
             args.maxAlternativeRoutes > 1 &&

@@ -22,7 +22,7 @@ import { Bbox, RoutingArgs, RoutingProfile } from '@/api/graphhopper'
 import { calcDist } from '@/distUtils'
 import config from 'config'
 import { customModel2prettyString, customModelExamples } from '@/sidebar/CustomModelExamples'
-import { Profiles } from '@/stores/profiles/profiles'
+import { DisabilityProfiles, getCustomModel } from '@/stores/profiles/profiles'
 
 export interface Coordinate {
     lat: number
@@ -42,7 +42,6 @@ export interface QueryStoreState {
     readonly routingProfile: RoutingProfile
     readonly customModelEnabled: boolean
     readonly customModelStr: string
-    readonly selectedProfile: Profiles
     readonly excludedPoints: [number, number][]
 }
 
@@ -116,8 +115,8 @@ export default class QueryStore extends Store<QueryStoreState> {
             },
             customModelEnabled: customModelEnabledInitially,
             customModelStr: initialCustomModelStr,
-            selectedProfile: "prothesis",
-            excludedPoints: [],
+            excludedPoints: [[52.517323,13.381484]],
+            // excludedPoints: [// ],
         }
     }
 
@@ -451,12 +450,7 @@ export default class QueryStore extends Store<QueryStoreState> {
          * Load custom models and avoid areas to exclude
          */
 
-        let customModel = null
-        if (state.customModelEnabled)
-            try {
-                customModel = JSON.parse(state.customModelStr)
-            } catch {}
-
+        const customModel: CustomModel = getCustomModel(state.excludedPoints)
         return {
             points: coordinates,
             profile: state.routingProfile.name,
