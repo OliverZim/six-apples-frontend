@@ -3,7 +3,7 @@
  */
 const config = {
     // the url of the GraphHopper routing backend, either use graphhopper.com or point it to your own GH instance
-    routingApi: 'https://graphhopper.com/api/1/',
+    routingApi: 'http://glossary-fruits-voltage-spell.trycloudflare.com/',
     // the url of the geocoding backend, either use graphhopper.com or point it to another geocoding service. use an empty string to disable the address search
     geocodingApi: 'https://graphhopper.com/api/1/',
     // the tile layer used by default, see MapOptionsStore.ts for all options
@@ -21,14 +21,10 @@ const config = {
     // parameters used for the routing request generation
     request: {
         details: [
-            'road_class',
             'road_environment',
-            'road_access',
             'surface',
             'max_speed',
             'average_speed',
-            'toll',
-            'track_type',
             'country',
         ],
     },
