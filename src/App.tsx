@@ -43,6 +43,7 @@ import PlainButton from '@/PlainButton'
 import useAreasLayer from '@/layers/UseAreasLayer'
 import useExternalMVTLayer from '@/layers/UseExternalMVTLayer'
 import LocationButton from '@/map/LocationButton'
+import Account from '@/map/Account'
 import { SettingsContext } from '@/contexts/SettingsContext'
 import usePOIsLayer from '@/layers/UsePOIsLayer'
 
@@ -182,6 +183,8 @@ function LargeScreenLayout({ query, route, map, error, mapOptions, encodedValues
                             showCustomModelBox={showCustomModelBox}
                             toggleCustomModelBox={() => setShowCustomModelBox(!showCustomModelBox)}
                             customModelBoxEnabled={query.customModelEnabled}
+                            customModelStr={query.customModelStr}
+                            encodedValues={encodedValues}
                         />
                         {showCustomModelBox && (
                             <CustomModelBox
@@ -215,16 +218,16 @@ function LargeScreenLayout({ query, route, map, error, mapOptions, encodedValues
             )}
             <div className={styles.popupContainer} id={POPUP_CONTAINER_ID} />
             <div className={styles.onMapRightSide}>
-                <MapOptions {...mapOptions} />
+                <MapOptions {...mapOptions} query={query} />
                 <LocationButton queryPoints={query.queryPoints} />
             </div>
             <div className={styles.map}>
                 <MapComponent map={map} />
             </div>
-
             <div className={styles.pathDetails}>
                 <PathDetails selectedPath={route.selectedPath} />
             </div>
+            <Account />
         </>
     )
 }
@@ -247,11 +250,10 @@ function SmallScreenLayout({ query, route, map, error, mapOptions, encodedValues
             </div>
             <div className={styles.smallScreenMapOptions}>
                 <div className={styles.onMapRightSide}>
-                    <MapOptions {...mapOptions} />
+                    <MapOptions {...mapOptions} query={query} />
                     <LocationButton queryPoints={query.queryPoints} />
                 </div>
             </div>
-
             <div className={styles.smallScreenRoutingResult}>
                 <RoutingResults
                     info={route.routingResult.info}
@@ -261,7 +263,7 @@ function SmallScreenLayout({ query, route, map, error, mapOptions, encodedValues
                     profile={query.routingProfile.name}
                 />
             </div>
-
+            <Account />
         </>
     )
 }

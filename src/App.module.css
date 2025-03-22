@@ -57,13 +57,18 @@
     position: relative;
     grid-column: 3 / span 1;
     grid-row: 1 / span 1;
-    z-index: 1;
-
+    z-index: 10;
     padding: 0.5rem;
+    pointer-events: auto;
 }
 
 .onMapRightSide > div {
     cursor: pointer !important;
+    margin-bottom: 10px;
+}
+
+.onMapRightSide > div:last-child {
+    margin-bottom: 0;
 }
 
 .onMapRightSide > div {
@@ -99,12 +104,6 @@
     grid-row: 2 / span 1;
     grid-column: 1 / span 1;
     justify-self: end;
-}
-
-.onMapRightSide > div {
-    background-color: white;
-    border-radius: 0.5rem;
-    box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.1);
 }
 
 .smallScreenRoutingResult {

@@ -64,6 +64,8 @@ export default function ({ query, route, error, encodedValues, drawAreas, map }:
                             showCustomModelBox={showCustomModelBox}
                             toggleCustomModelBox={() => setShowCustomModelBox(!showCustomModelBox)}
                             customModelBoxEnabled={query.customModelEnabled}
+                            customModelStr={query.customModelStr}
+                            encodedValues={encodedValues}
                         />
                         {showCustomModelBox && (
                             <CustomModelBox

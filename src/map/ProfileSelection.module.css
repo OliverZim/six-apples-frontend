@@ -1,0 +1,76 @@
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    min-width: 300px;
+    max-width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.title {
+    margin: 0 0 20px 0;
+    font-size: 18px;
+    color: #333;
+    text-align: center;
+}
+
+.profileGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 12px;
+}
+
+.profileButton {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.profileButton:hover {
+    background: #f5f5f5;
+    transform: translateY(-1px);
+}
+
+.profileButton svg {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 8px;
+    color: #666;
+}
+
+.profileButton span {
+    font-size: 12px;
+    color: #666;
+    text-align: center;
+}
+
+.selected {
+    background: #e3f2fd;
+    border-color: #90caf9;
+}
+
+.selected:hover {
+    background: #bbdefb;
+} 

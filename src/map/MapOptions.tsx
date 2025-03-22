@@ -5,9 +5,17 @@ import Dispatcher from '@/stores/Dispatcher'
 import { SelectMapLayer, ToggleExternalMVTLayer, ToggleRoutingGraph, ToggleUrbanDensityLayer } from '@/actions/Actions'
 import PlainButton from '@/PlainButton'
 import LayerImg from './layer-group-solid.svg'
+import ProfileIcon from './route.svg'
+import ProfileSelection from './ProfileSelection'
+import { QueryStoreState } from '@/stores/QueryStore'
 import * as config from 'config'
 
-export default function (props: MapOptionsStoreState) {
+interface MapOptionsProps extends MapOptionsStoreState {
+    query: QueryStoreState
+}
+
+export default function MapOptions(props: MapOptionsProps) {
+    const [showProfileSelection, setShowProfileSelection] = useState(false)
     const isMap = props.selectedStyle.name === 'Map'
     
     const toggleMapStyle = () => {
@@ -27,6 +35,22 @@ export default function (props: MapOptionsStoreState) {
                     {isMap ? 'Satellite' : 'Map'}
                 </div>
             </PlainButton>
+            <PlainButton 
+                className={styles.layerButton} 
+                onClick={() => setShowProfileSelection(true)}
+                title="Select routing profile"
+            >
+                <ProfileIcon />
+                <div className={styles.buttonContent}>
+                    Profile
+                </div>
+            </PlainButton>
+            <ProfileSelection 
+                profiles={props.query.profiles}
+                selectedProfile={props.query.routingProfile}
+                isOpen={showProfileSelection}
+                onClose={() => setShowProfileSelection(false)}
+            />
         </div>
     )
 }

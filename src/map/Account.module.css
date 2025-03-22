@@ -1,0 +1,42 @@
+.accountContainer {
+    position: fixed;
+    z-index: 10;
+    bottom: 20px;
+    right: 10px;
+    display: flex;
+    pointer-events: auto;
+}
+
+.accountButton {
+    margin: 5px !important;
+    padding: 3px !important;
+    width: 34px !important;
+    height: 34px !important;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    transition: all 0.2s ease;
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+}
+
+.accountButton:hover {
+    background: #f5f5f5;
+}
+
+.accountButton svg {
+    width: 14px;
+    height: 14px;
+    color: #666;
+}
+
+.buttonContent {
+    color: #666;
+    font-size: 8px;
+    font-weight: 500;
+    white-space: nowrap;
+    line-height: 1;
+} 
