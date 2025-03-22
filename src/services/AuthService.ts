@@ -85,4 +85,21 @@ export class AuthService {
             return null;
         }
     }
+
+    static async updateProfile(updates: { username?: string; email?: string; currentPassword?: string; newPassword?: string }): Promise<AuthResponse> {
+        try {
+            const response = await fetch(`${this.API_URL}/profile`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify(updates),
+            });
+            return await response.json();
+        } catch (error) {
+            console.error('Update profile error:', error);
+            return { success: false, error: 'Network error' };
+        }
+    }
 } 

@@ -5,6 +5,7 @@ import compassLogo from './compass-logo.png'
 import { AuthService } from '@/services/AuthService'
 import SignupWizard, { WizardData } from '@/components/SignupWizard/SignupWizard'
 import { userPreferencesStore } from '@/stores/UserPreferencesStore'
+import ProfileEdit from './ProfileEdit'
 
 interface ProfileState {
     isLoggedIn: boolean
@@ -35,6 +36,7 @@ export default function Profile({ isOpen, onClose }: ProfileProps) {
         password: ''
     })
     const [showWizard, setShowWizard] = useState(false)
+    const [showProfileEdit, setShowProfileEdit] = useState(false)
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -111,6 +113,14 @@ export default function Profile({ isOpen, onClose }: ProfileProps) {
         setShowWizard(false)
     }
 
+    const handleProfileUpdate = (username: string, email: string) => {
+        setProfileState(prev => ({
+            ...prev,
+            username,
+            email
+        }))
+    }
+
     if (!isOpen) return null
 
     return (
@@ -145,7 +155,7 @@ export default function Profile({ isOpen, onClose }: ProfileProps) {
                         </div>
 
                         <div className={styles.menuItems}>
-                            <button className={styles.menuItem}>
+                            <button className={styles.menuItem} onClick={() => setShowProfileEdit(true)}>
                                 <span className={styles.icon}>👤</span>
                                 {tr('Your profile')}
                             </button>
@@ -156,10 +166,6 @@ export default function Profile({ isOpen, onClose }: ProfileProps) {
                             <button className={styles.menuItem}>
                                 <span className={styles.icon}>📍</span>
                                 {tr('Location sharing')}
-                            </button>
-                            <button className={styles.menuItem}>
-                                <span className={styles.icon}>💾</span>
-                                {tr('Offline maps')}
                             </button>
                             <button className={styles.menuItem}>
                                 <span className={styles.icon}>🔒</span>
@@ -245,6 +251,15 @@ export default function Profile({ isOpen, onClose }: ProfileProps) {
                     onComplete={handleWizardComplete}
                     onClose={handleWizardClose}
                     username={profileState.username || ''}
+                />
+            )}
+
+            {showProfileEdit && profileState.username && profileState.email && (
+                <ProfileEdit
+                    username={profileState.username}
+                    email={profileState.email}
+                    onClose={() => setShowProfileEdit(false)}
+                    onUpdate={handleProfileUpdate}
                 />
             )}
         </div>

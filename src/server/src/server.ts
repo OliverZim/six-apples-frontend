@@ -123,6 +123,45 @@ app.get('/api/auth/me', async (req, res) => {
     }
 });
 
+app.post('/api/auth/profile', async (req, res) => {
+    if (!req.session.userId) {
+        return res.status(401).json({ success: false, error: 'Not authenticated' });
+    }
+
+    const { username, email, currentPassword, newPassword } = req.body;
+    
+    try {
+        const user = await AuthService.findUserById(req.session.userId);
+        if (!user) {
+            return res.status(404).json({ success: false, error: 'User not found' });
+        }
+
+        // If trying to change password, verify current password
+        if (newPassword) {
+            const isValid = await AuthService.verifyPassword(req.session.userId, currentPassword);
+            if (!isValid) {
+                return res.status(400).json({ success: false, error: 'Current password is incorrect' });
+            }
+        }
+
+        const success = await AuthService.updateProfile(req.session.userId, {
+            username,
+            email,
+            newPassword
+        });
+
+        if (success) {
+            const updatedUser = await AuthService.findUserById(req.session.userId);
+            return res.json({ success: true, user: updatedUser });
+        } else {
+            return res.status(500).json({ success: false, error: 'Failed to update profile' });
+        }
+    } catch (error) {
+        console.error('Update profile error:', error);
+        return res.status(500).json({ success: false, error: 'Server error' });
+    }
+});
+
 // Error handling middleware
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
     console.error('Unhandled error:', err);

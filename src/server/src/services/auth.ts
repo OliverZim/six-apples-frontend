@@ -207,4 +207,71 @@ export class AuthService {
             });
         });
     }
+
+    static async verifyPassword(userId: number, password: string): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.get<DBUser>(
+                'SELECT password_hash FROM users WHERE id = ?',
+                [userId],
+                async (err, user) => {
+                    if (err) reject(err);
+                    if (!user) {
+                        resolve(false);
+                        return;
+                    }
+                    const isMatch = await bcrypt.compare(password, user.password_hash);
+                    resolve(isMatch);
+                }
+            );
+        });
+    }
+
+    static async updateProfile(userId: number, profileUpdates: { username?: string; email?: string; newPassword?: string }): Promise<boolean> {
+        try {
+            const updates: string[] = [];
+            const values: any[] = [];
+
+            if (profileUpdates.username) {
+                updates.push('username = ?');
+                values.push(profileUpdates.username);
+            }
+
+            if (profileUpdates.email) {
+                updates.push('email = ?');
+                values.push(profileUpdates.email);
+            }
+
+            if (profileUpdates.newPassword) {
+                const salt = await bcrypt.genSalt(10);
+                const passwordHash = await bcrypt.hash(profileUpdates.newPassword, salt);
+                updates.push('password_hash = ?');
+                values.push(passwordHash);
+            }
+
+            if (updates.length === 0) return true;
+
+            values.push(userId);
+
+            return new Promise((resolve, reject) => {
+                db.run(
+                    `UPDATE users SET ${updates.join(', ')} WHERE id = ?`,
+                    values,
+                    function(err) {
+                        if (err) {
+                            if (err.message.includes('UNIQUE constraint failed')) {
+                                resolve(false);
+                            } else {
+                                reject(err);
+                            }
+                        } else {
+                            resolve(true);
+                        }
+                    }
+                );
+            });
+        } catch (error) {
+            console.error('Update profile error:', error);
+            return false;
+        }
+    }
 } 
