@@ -48,7 +48,7 @@ const apiKey = url.searchParams.has('key') ? url.searchParams.get('key') : confi
 setApi(config.routingApi, config.geocodingApi, apiKey || '')
 
 const initialCustomModelStr = url.searchParams.get('custom_model')
-const queryStore = new QueryStore(getApi(), initialCustomModelStr)
+const queryStore = new QueryStore(getApi())
 const routeStore = new RouteStore()
 
 setStores({
