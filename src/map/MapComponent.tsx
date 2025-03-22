@@ -3,17 +3,18 @@ import styles from '@/map/Map.module.css'
 import { useEffect, useRef } from 'react'
 import { Map } from 'ol'
 import { Coordinate, getBBoxFromCoord } from '@/stores/QueryStore'
-import { Bbox } from '@/api/graphhopper'
+import { Bbox, RoutingResult } from '@/api/graphhopper'
 import Dispatcher from '@/stores/Dispatcher'
 import { ErrorAction } from '@/actions/Actions'
 import { tr } from '@/translation/Translation'
+import { RouteStoreState } from '@/stores/RouteStore'
 
 type MapComponentProps = {
     map: Map
 }
 
 /** A small react component that simply attaches our map instance to a div to show the map **/
-export default function ({ map }: MapComponentProps) {
+export default function ({ map, route }: { map: Map, route: RouteStoreState }) {
     const mapElement = useRef<HTMLDivElement | null>(null)
     useEffect(() => {
         map.setTarget(mapElement.current!)

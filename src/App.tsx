@@ -128,6 +128,7 @@ export default function App() {
                     mapFeatures={mapFeatures}
                     poiState={pois}
                     query={query}
+                    route={route}
                 />
                 <ContextMenu map={map} route={route} queryPoints={query.queryPoints} />
                 {isSmallScreen ? (
@@ -203,6 +204,7 @@ function LargeScreenLayout({ query, route, map, error, mapOptions, encodedValues
                             selectedPath={route.selectedPath}
                             currentRequest={query.currentRequest}
                             profile={query.routingProfile.name}
+                            route={route}
                         />
                         <div>
                             <PoweredBy />
@@ -222,7 +224,7 @@ function LargeScreenLayout({ query, route, map, error, mapOptions, encodedValues
                 <LocationButton queryPoints={query.queryPoints} />
             </div>
             <div className={styles.map}>
-                <MapComponent map={map} />
+                <MapComponent map={map} route={route}/>
             </div>
             <div className={styles.pathDetails}>
                 <PathDetails selectedPath={route.selectedPath} />
@@ -246,7 +248,7 @@ function SmallScreenLayout({ query, route, map, error, mapOptions, encodedValues
                 />
             </div>
             <div className={styles.smallScreenMap}>
-                <MapComponent map={map} />
+                <MapComponent map={map} route={route}/>
             </div>
             <div className={styles.smallScreenMapOptions}>
                 <div className={styles.onMapRightSide}>
@@ -261,6 +263,7 @@ function SmallScreenLayout({ query, route, map, error, mapOptions, encodedValues
                     selectedPath={route.selectedPath}
                     currentRequest={query.currentRequest}
                     profile={query.routingProfile.name}
+                    route={route}
                 />
             </div>
             <Account />

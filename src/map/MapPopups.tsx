@@ -2,12 +2,15 @@ import { Map } from 'ol'
 import PathDetailPopup from '@/layers/PathDetailPopup'
 import MapFeaturePopup from '@/layers/MapFeaturePopup'
 import InstructionPopup from '@/layers/InstructionPopup'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { PathDetailsStoreState } from '@/stores/PathDetailsStore'
 import { MapFeatureStoreState } from '@/stores/MapFeatureStore'
 import { POIsStoreState } from '@/stores/POIsStore'
 import POIStatePopup from '@/layers/POIPopup'
 import { QueryStoreState } from '@/stores/QueryStore'
+import { RouteStoreState } from '@/stores/RouteStore'
+import { getClosestStreetViewImage } from '@/api/fetchimage'
+import { Coordinate } from '@/stores/QueryStore'
 
 interface MapPopupProps {
     map: Map
@@ -15,9 +18,13 @@ interface MapPopupProps {
     mapFeatures: MapFeatureStoreState
     poiState: POIsStoreState
     query: QueryStoreState
+    route: RouteStoreState
 }
 
-export default function MapPopups({ map, pathDetails, mapFeatures, poiState, query }: MapPopupProps) {
+export default function MapPopups({ map, pathDetails, mapFeatures, poiState, query, route }: MapPopupProps) {
+
+    
+
     return (
         <>
             <PathDetailPopup map={map} pathDetails={pathDetails} />
@@ -32,6 +39,7 @@ export default function MapPopups({ map, pathDetails, mapFeatures, poiState, que
                 coordinate={mapFeatures.instructionCoordinate}
             />
             <POIStatePopup map={map} poiState={poiState} points={query.queryPoints} />
+            
         </>
     )
 }

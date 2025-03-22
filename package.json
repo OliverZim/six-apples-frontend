@@ -15,7 +15,12 @@
         "test": "jest"
     },
     "dependencies": {
+        "@types/bcryptjs": "^2.4.6",
+        "@types/cors": "^2.8.17",
+        "@types/express-session": "^1.18.1",
+        "@types/sqlite3": "^3.1.11",
         "axios": "^1.8.4",
+        "bcryptjs": "^3.0.2",
         "custom-model-editor": "github:graphhopper/custom-model-editor#5ebd80570329f7abfc95c39624be1f1a379cf392",
         "geojson": "^0.5.0",
         "heightgraph": "github:easbar/Leaflet.Heightgraph#5f4f0b1fff3646aa071981381f5955c9e6f111f0",

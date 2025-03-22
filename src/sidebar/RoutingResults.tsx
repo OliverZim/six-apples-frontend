@@ -29,13 +29,15 @@ import DangerousIcon from '@/sidebar/routeHints/warn_report.svg'
 import { Bbox } from '@/api/graphhopper'
 import { SettingsContext } from '@/contexts/SettingsContext'
 import { Settings } from '@/stores/SettingsStore'
-
+import { RouteStoreState } from '@/stores/RouteStore'
+import { getClosestStreetViewImage } from '@/api/fetchimage'
 export interface RoutingResultsProps {
     info: RoutingResultInfo
     paths: Path[]
     selectedPath: Path
     currentRequest: CurrentRequest
     profile: string
+    route: RouteStoreState
 }
 
 export default function RoutingResults(props: RoutingResultsProps) {
@@ -51,11 +53,13 @@ function RoutingResult({
     path,
     isSelected,
     profile,
+    route
 }: {
     info: RoutingResultInfo
     path: Path
     isSelected: boolean
     profile: string
+    route: RouteStoreState
 }) {
     const [isExpanded, setExpanded] = useState(false)
     const [selectedRH, setSelectedRH] = useState('')
@@ -115,6 +119,46 @@ function RoutingResult({
         mtbRatingInfo.distance > 0 ||
         hikeRatingInfo.distance > 0 ||
         steepInfo.distance > 0
+        
+        const [stepsImageUrl, setStepsImageUrl] = useState<string>("")
+    
+        useEffect(() => {
+            const fetchStepsImage = async () => {
+                if (route.routingResult && route.routingResult.paths && route.routingResult.paths.length > 0) {
+                    const path = route.routingResult.paths[0];
+                    const coordinates = path.points.coordinates ? path.points.coordinates : [];
+                    
+                    // Check if road_class details exist and look for steps
+                    if (path.details && path.details.road_class) {
+                        for (const detail of path.details.road_class) {
+                            // Check if the road class is "steps"
+                            if (detail.length === 3 && detail[2] === "steps") {
+                                const startIndex = detail[0];
+                                
+                                // Make sure the index is valid
+                                if (startIndex < coordinates.length) {
+                                    const stepsCoord = coordinates[startIndex];
+                                    
+                                    // Get the street view image for the steps location
+                                    const imageUrl = await getClosestStreetViewImage(stepsCoord[0], stepsCoord[1]);
+                                    
+                                    // Set the image URL for display
+                                    setStepsImageUrl(imageUrl);
+                                    
+                                    // Break after finding the first occurrence of steps
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    // Clear the image if no route is available
+                    setStepsImageUrl("");
+                }
+            }
+            
+            fetchStepsImage();
+        }, [route])
 
     return (
         <div className={styles.resultRow}>
@@ -294,6 +338,9 @@ function RoutingResult({
                             segments={stepsInfo.segments}
                             values={[]}
                         />
+
+            <img src={stepsImageUrl} alt="Street View of Steps" />
+            
                         <RHButton
                             setDescription={b => setDescriptionRH(b)}
                             description={tr('way_contains', [tr('tracks')])}
@@ -546,12 +593,12 @@ function getLength(paths: Path[], subRequests: SubRequest[]) {
 
 function createSingletonListContent(props: RoutingResultsProps) {
     if (props.paths.length > 0)
-        return <RoutingResult path={props.selectedPath} isSelected={true} profile={props.profile} info={props.info} />
+        return <RoutingResult path={props.selectedPath} isSelected={true} profile={props.profile} info={props.info} route={props.route}/>
     if (hasPendingRequests(props.currentRequest.subRequests)) return <RoutingResultPlaceholder key={1} />
     return ''
 }
 
-function createListContent({ info, paths, currentRequest, selectedPath, profile }: RoutingResultsProps) {
+function createListContent({ info, paths, currentRequest, selectedPath, profile, route }: RoutingResultsProps) {
     const length = getLength(paths, currentRequest.subRequests)
     const result = []
 
@@ -564,6 +611,7 @@ function createListContent({ info, paths, currentRequest, selectedPath, profile 
                     isSelected={paths[i] === selectedPath}
                     profile={profile}
                     info={info}
+                    route={route}
                 />
             )
         else result.push(<RoutingResultPlaceholder key={i} />)
