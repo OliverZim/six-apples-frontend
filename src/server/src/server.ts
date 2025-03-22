@@ -9,8 +9,14 @@ const port = process.env.PORT || 3001;
 // Middleware
 app.use(express.json());
 app.use(cors({
-    origin: 'http://localhost:3000',
-    credentials: true
+    origin: [
+        'http://localhost:3000',
+        'https://sister-carb-capability-ie.trycloudflare.com',
+        'https://carries-sick-seas-oklahoma.trycloudflare.com'
+    ],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Content-Length', 'X-Requested-With']
 }));
 
 app.use(session({
@@ -30,6 +36,9 @@ declare module 'express-session' {
         userId?: number;
     }
 }
+
+// Handle preflight requests
+app.options('*', cors());
 
 // Routes
 app.post('/api/auth/signup', async (req, res) => {

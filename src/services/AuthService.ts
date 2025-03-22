@@ -7,7 +7,7 @@ interface AuthResponse {
 }
 
 export class AuthService {
-    private static API_URL = 'http://localhost:3001/api/auth';
+    private static API_URL = 'https://sister-carb-capability-ie.trycloudflare.com/api/auth';
 
     static async login(email: string, password: string): Promise<AuthResponse> {
         try {
