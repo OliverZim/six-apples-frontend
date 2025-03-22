@@ -129,7 +129,7 @@ function RoutingResult({
         steepInfo.distance > 0
 
 
-    const EXCLUDE_AREA = 10 // meter
+    const EXCLUDE_AREA = 30 // meter
     const EXCLUDE_AREA_LAT = 8.98311174991017e-06 * EXCLUDE_AREA
     const EXCLUDE_AREA_LON = 1.4763165177199368e-05 * EXCLUDE_AREA
 
