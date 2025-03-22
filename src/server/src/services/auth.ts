@@ -9,10 +9,11 @@ export interface User {
 }
 
 export interface UserPreferences {
-    difficulty: 'no impairment' | 'crutches/walking stick' | 'prosthesis' | 'wheelchair';
+    difficulty: 'foot' | 'elderly' | 'prosthesis' | 'wheelchair';
     age: number;
     avoidStairs: boolean;
     preferElevators: boolean;
+    routingProfile?: string;
 }
 
 interface DBUser {
@@ -24,6 +25,7 @@ interface DBUser {
     age?: number;
     avoid_stairs?: number;
     prefer_elevators?: number;
+    routing_profile?: string;
 }
 
 export interface AuthResponse {
@@ -36,7 +38,7 @@ export class AuthService {
     static async findUserByEmail(email: string): Promise<User | null> {
         return new Promise((resolve, reject) => {
             db.get<DBUser>(
-                'SELECT id, username, email, difficulty, age, avoid_stairs, prefer_elevators FROM users WHERE email = ?',
+                'SELECT id, username, email, difficulty, age, avoid_stairs, prefer_elevators, routing_profile FROM users WHERE email = ?',
                 [email],
                 (err, row) => {
                     if (err) reject(err);
@@ -52,7 +54,8 @@ export class AuthService {
                             difficulty: row.difficulty as UserPreferences['difficulty'],
                             age: row.age || 30,
                             avoidStairs: Boolean(row.avoid_stairs),
-                            preferElevators: Boolean(row.prefer_elevators)
+                            preferElevators: Boolean(row.prefer_elevators),
+                            routingProfile: row.routing_profile
                         } : undefined
                     });
                 }
@@ -63,7 +66,7 @@ export class AuthService {
     static async findUserById(id: number): Promise<User | null> {
         return new Promise((resolve, reject) => {
             db.get<DBUser>(
-                'SELECT id, username, email, difficulty, age, avoid_stairs, prefer_elevators FROM users WHERE id = ?',
+                'SELECT id, username, email, difficulty, age, avoid_stairs, prefer_elevators, routing_profile FROM users WHERE id = ?',
                 [id],
                 (err, row) => {
                     if (err) reject(err);
@@ -79,7 +82,8 @@ export class AuthService {
                             difficulty: row.difficulty as UserPreferences['difficulty'],
                             age: row.age || 30,
                             avoidStairs: Boolean(row.avoid_stairs),
-                            preferElevators: Boolean(row.prefer_elevators)
+                            preferElevators: Boolean(row.prefer_elevators),
+                            routingProfile: row.routing_profile
                         } : undefined
                     });
                 }
@@ -91,13 +95,14 @@ export class AuthService {
         return new Promise((resolve, reject) => {
             db.run(
                 `UPDATE users 
-                SET difficulty = ?, age = ?, avoid_stairs = ?, prefer_elevators = ?
+                SET difficulty = ?, age = ?, avoid_stairs = ?, prefer_elevators = ?, routing_profile = ?
                 WHERE id = ?`,
                 [
                     preferences.difficulty,
                     preferences.age,
                     preferences.avoidStairs ? 1 : 0,
                     preferences.preferElevators ? 1 : 0,
+                    preferences.routingProfile,
                     userId
                 ],
                 (err) => {
@@ -120,11 +125,11 @@ export class AuthService {
             const salt = await bcrypt.genSalt(10);
             const passwordHash = await bcrypt.hash(password, salt);
 
-            // Insert new user
+            // Insert new user with default preferences
             return new Promise((resolve, reject) => {
                 db.run(
-                    'INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)',
-                    [username, email, passwordHash],
+                    'INSERT INTO users (username, email, password_hash, difficulty, age, avoid_stairs, prefer_elevators, routing_profile) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                    [username, email, passwordHash, 'foot', 30, 0, 0, 'foot'],
                     function(err) {
                         if (err) {
                             if (err.message.includes('UNIQUE constraint failed: users.username')) {
@@ -138,7 +143,14 @@ export class AuthService {
                                 user: {
                                     id: this.lastID,
                                     username,
-                                    email
+                                    email,
+                                    preferences: {
+                                        difficulty: 'foot',
+                                        age: 30,
+                                        avoidStairs: false,
+                                        preferElevators: false,
+                                        routingProfile: 'foot'
+                                    }
                                 }
                             });
                         }
@@ -199,7 +211,8 @@ export class AuthService {
                     difficulty TEXT,
                     age INTEGER,
                     avoid_stairs INTEGER DEFAULT 0,
-                    prefer_elevators INTEGER DEFAULT 0
+                    prefer_elevators INTEGER DEFAULT 0,
+                    routing_profile TEXT
                 )
             `, (err) => {
                 if (err) reject(err);

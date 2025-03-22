@@ -22,6 +22,7 @@ import { Bbox, RoutingArgs, RoutingProfile } from '@/api/graphhopper'
 import { calcDist } from '@/distUtils'
 import config from 'config'
 import { customModel2prettyString, customModelExamples } from '@/sidebar/CustomModelExamples'
+import { AuthService } from '@/services/AuthService'
 
 export interface Coordinate {
     lat: number
@@ -80,12 +81,52 @@ export interface SubRequest {
     readonly state: RequestState
 }
 
+// Map user difficulty to routing profiles
+const difficultyToProfile: Record<string, string> = {
+    'foot': 'foot',
+    'elderly': 'elderly',
+    'prosthesis': 'prosthesis',
+    'wheelchair': 'wheelchair'
+}
+
 export default class QueryStore extends Store<QueryStoreState> {
     private readonly api: Api
 
     constructor(api: Api, initialCustomModelStr: string | null = null) {
         super(QueryStore.getInitialState(initialCustomModelStr))
         this.api = api
+        this.loadUserPreferences()
+    }
+
+    private async loadUserPreferences() {
+        const user = await AuthService.getCurrentUser()
+        if (user?.preferences) {
+            const preferences = user.preferences
+            // If user has a saved routing profile, use it
+            if (preferences.routingProfile) {
+                // Check if the profile exists in available profiles
+                const profileExists = this.state.profiles.some(p => p.name === preferences.routingProfile)
+                if (profileExists) {
+                    this.reduce(this.state, new SetVehicleProfile({ name: preferences.routingProfile }))
+                }
+            }
+            // Otherwise, use the difficulty-based profile
+            else if (preferences.difficulty) {
+                const preferredProfile = difficultyToProfile[preferences.difficulty]
+                if (preferredProfile) {
+                    // Check if the profile exists in available profiles
+                    const profileExists = this.state.profiles.some(p => p.name === preferredProfile)
+                    if (profileExists) {
+                        this.reduce(this.state, new SetVehicleProfile({ name: preferredProfile }))
+                    }
+                }
+            }
+        }
+    }
+
+    // Add method to handle user login
+    public async handleUserLogin() {
+        await this.loadUserPreferences()
     }
 
     private static getInitialState(initialCustomModelStr: string | null): QueryStoreState {
@@ -252,21 +293,54 @@ export default class QueryStore extends Store<QueryStoreState> {
                 ? Object.keys(config.profiles).map(profile => ({ name: profile }))
                 : action.result.profiles
 
-            // if a routing profile was in the url keep it, otherwise select the first entry as default profile
-            const profile = state.routingProfile.name ? state.routingProfile : profiles[0]
-            return this.routeIfReady(
-                {
-                    ...state,
-                    profiles,
-                    routingProfile: profile,
-                },
-                true
-            )
+            // Check URL for profile parameter
+            const url = new URL(window.location.href)
+            const urlProfile = url.searchParams.get('profile')
+
+            // Load user preferences and set profile
+            AuthService.getCurrentUser().then(user => {
+                if (user?.preferences?.routingProfile) {
+                    // If user has a saved profile, use it
+                    this.reduce(this.state, new SetVehicleProfile({ name: user.preferences.routingProfile }))
+                } else if (user?.preferences?.difficulty) {
+                    // Otherwise use difficulty-based profile
+                    const preferredProfile = difficultyToProfile[user.preferences.difficulty]
+                    if (preferredProfile) {
+                        this.reduce(this.state, new SetVehicleProfile({ name: preferredProfile }))
+                    }
+                } else if (urlProfile) {
+                    // If no user preferences but URL has profile, use that
+                    this.reduce(this.state, new SetVehicleProfile({ name: urlProfile }))
+                } else {
+                    // If no preferences or URL profile, use first profile as default
+                    this.reduce(this.state, new SetVehicleProfile(profiles[0]))
+                }
+            })
+
+            return {
+                ...state,
+                profiles,
+            }
         } else if (action instanceof SetVehicleProfile) {
             const newState: QueryStoreState = {
                 ...state,
                 routingProfile: action.profile,
             }
+
+            // Update URL with new profile
+            const url = new URL(window.location.href)
+            url.searchParams.set('profile', action.profile.name)
+            window.history.replaceState({}, '', url.toString())
+
+            // Save the routing profile to user preferences if user is logged in
+            AuthService.getCurrentUser().then(user => {
+                if (user?.preferences) {
+                    AuthService.savePreferences({
+                        ...user.preferences,
+                        routingProfile: action.profile.name
+                    });
+                }
+            });
 
             return this.routeIfReady(newState, true)
         } else if (action instanceof SetCustomModel) {

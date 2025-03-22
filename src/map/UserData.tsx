@@ -13,7 +13,7 @@ interface UserDataFormData {
 }
 
 const defaultPreferences: UserPreferences = {
-    difficulty: 'no impairment',
+    difficulty: 'foot',
     age: 30,
     avoidStairs: false,
     preferElevators: false
@@ -91,8 +91,8 @@ export default function UserData({ onClose }: UserDataProps) {
                                 onChange={handleInputChange}
                                 required
                             >
-                                <option value="no impairment">{tr('No Impairment')}</option>
-                                <option value="crutches/walking stick">{tr('Crutches/Walking Stick')}</option>
+                                <option value="foot">{tr('foot')}</option>
+                                <option value="elderly">{tr('elderly')}</option>
                                 <option value="prosthesis">{tr('Prosthesis')}</option>
                                 <option value="wheelchair">{tr('Wheelchair')}</option>
                             </select>

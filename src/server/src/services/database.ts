@@ -24,6 +24,7 @@ const schema = `
         age INTEGER,
         avoid_stairs INTEGER DEFAULT 0,
         prefer_elevators INTEGER DEFAULT 0,
+        routing_profile TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 `;
@@ -42,6 +43,7 @@ const migration = `
         age INTEGER,
         avoid_stairs INTEGER DEFAULT 0,
         prefer_elevators INTEGER DEFAULT 0,
+        routing_profile TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
     
@@ -53,9 +55,10 @@ const migration = `
         email,
         password_hash,
         difficulty,
-        NULL as age,
+        age,
         CASE WHEN avoid_stairs = 1 THEN 1 ELSE 0 END as avoid_stairs,
         CASE WHEN prefer_elevators = 1 THEN 1 ELSE 0 END as prefer_elevators,
+        NULL as routing_profile,
         created_at
     FROM users;
     
@@ -66,20 +69,25 @@ const migration = `
     COMMIT;
 `;
 
-db.exec(schema, (err) => {
-    if (err) {
-        console.error('Error creating database schema:', err);
-    } else {
-        console.log('Database schema initialized successfully');
-        // Run migration
-        db.exec(migration, (migrationErr) => {
-            if (migrationErr) {
-                console.error('Error running migration:', migrationErr);
-            } else {
-                console.log('Database migration completed successfully');
-            }
-        });
-    }
+// Initialize database
+db.serialize(() => {
+    // Run schema
+    db.exec(schema, (err) => {
+        if (err) {
+            console.error('Error creating schema:', err);
+        } else {
+            console.log('Database schema initialized successfully');
+        }
+    });
+
+    // Run migration
+    db.exec(migration, (err) => {
+        if (err) {
+            console.error('Error running migration:', err);
+        } else {
+            console.log('Database migration completed successfully');
+        }
+    });
 });
 
 export default db; 

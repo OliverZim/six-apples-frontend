@@ -7,6 +7,8 @@ import SignupWizard, { WizardData } from '@/components/SignupWizard/SignupWizard
 import { userPreferencesStore } from '@/stores/UserPreferencesStore'
 import ProfileEdit from './ProfileEdit'
 import UserData from './UserData'
+import { getQueryStore } from '@/stores/Stores'
+import { SetVehicleProfile } from '@/actions/Actions'
 
 interface ProfileState {
     isLoggedIn: boolean
@@ -77,9 +79,15 @@ export default function Profile({ isOpen, onClose }: ProfileProps) {
                     email: response.user.email
                 })
                 
+                // Update profile selection after login
+                await getQueryStore().handleUserLogin()
+                
                 // Show wizard only after successful signup
                 if (!isLogin) {
                     setShowWizard(true)
+                } else {
+                    // Force reload after login
+                    window.location.reload()
                 }
             } else {
                 setError(response.error || 'Authentication failed')
@@ -93,6 +101,17 @@ export default function Profile({ isOpen, onClose }: ProfileProps) {
         await AuthService.logout()
         setProfileState({ isLoggedIn: false })
         userPreferencesStore.resetPreferences()
+        
+        // Clear URL parameters
+        const url = new URL(window.location.href)
+        url.searchParams.delete('profile')
+        window.history.replaceState({}, '', url.toString())
+        
+        // Reset to default profile
+        getQueryStore().reduce(getQueryStore().state, new SetVehicleProfile({ name: 'foot' }))
+        
+        // Force reload after logout
+        window.location.reload()
     }
 
     const handleWizardComplete = async (data: WizardData) => {

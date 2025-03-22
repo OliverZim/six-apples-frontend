@@ -8,7 +8,7 @@ interface SignupWizardProps {
 }
 
 export interface WizardData {
-    difficulty: 'no impairment' | 'crutches/walking stick' | 'prosthesis' | 'wheelchair';
+    difficulty: 'foot' | 'elderly' | 'prosthesis' | 'wheelchair';
     preferences: {
         age: number;
         avoidStairs: boolean;
@@ -19,7 +19,7 @@ export interface WizardData {
 const SignupWizard: React.FC<SignupWizardProps> = ({ onComplete, onClose, username }) => {
     const [currentStep, setCurrentStep] = useState(1);
     const [wizardData, setWizardData] = useState<WizardData>({
-        difficulty: 'no impairment',
+        difficulty: 'foot',
         preferences: {
             age: 30,
             avoidStairs: false,
@@ -56,16 +56,16 @@ const SignupWizard: React.FC<SignupWizardProps> = ({ onComplete, onClose, userna
                         <h2>Select Your Difficulty Level</h2>
                         <div className={styles.options}>
                             <button
-                                className={`${styles.option} ${wizardData.difficulty === 'no impairment' ? styles.selected : ''}`}
-                                onClick={() => handleDifficultySelect('no impairment')}
+                                className={`${styles.option} ${wizardData.difficulty === 'foot' ? styles.selected : ''}`}
+                                onClick={() => handleDifficultySelect('foot')}
                             >
-                                No Impairment
+                                foot
                             </button>
                             <button
-                                className={`${styles.option} ${wizardData.difficulty === 'crutches/walking stick' ? styles.selected : ''}`}
-                                onClick={() => handleDifficultySelect('crutches/walking stick')}
+                                className={`${styles.option} ${wizardData.difficulty === 'elderly' ? styles.selected : ''}`}
+                                onClick={() => handleDifficultySelect('elderly')}
                             >
-                                Crutches/Walking Stick
+                                elderly
                             </button>
                             <button
                                 className={`${styles.option} ${wizardData.difficulty === 'prosthesis' ? styles.selected : ''}`}
