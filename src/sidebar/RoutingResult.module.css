@@ -208,27 +208,75 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.7);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    backdrop-filter: blur(3px);
 }
 
 .modalContent {
     background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    max-width: 90vw;
+    padding: 32px;
+    border-radius: 12px;
+    max-width: 800px;
+    width: 90vw;
     max-height: 90vh;
-    overflow: auto;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 24px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+}
+
+.modalTitle {
+    text-align: center;
+    margin: 0;
+    color: #333;
+    font-size: 1.5rem;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.modalContent img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .modalButtons {
     display: flex;
-    justify-content: flex-end;
-    gap: 8px;
+    justify-content: space-between;
+    padding-top: 16px;
+    border-top: 1px solid #eee;
+}
+
+.modalButtons button {
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+    min-width: 120px;
+}
+
+.modalButtons button:first-child {
+    background-color: #f5f5f5;
+    color: #333;
+}
+
+.modalButtons button:first-child:hover {
+    background-color: #e5e5e5;
+}
+
+.modalButtons button:last-child {
+    background-color: #2764c8;
+    color: white;
+}
+
+.modalButtons button:last-child:hover {
+    background-color: #1e4fa0;
 }

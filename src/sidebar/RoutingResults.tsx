@@ -315,15 +315,24 @@ function RoutingResult({
                         />
 
             {showStepsModal && (
-                <div className={styles.modalOverlay}>
-                    <div className={styles.modalContent}>
-                        <img src={stepsImageUrl} alt="Street View of Steps" style={{ maxWidth: '100%', maxHeight: '70vh' }} />
+                <div className={styles.modalOverlay} onClick={() => setShowStepsModal(false)}>
+                    <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+                        <h2 className={styles.modalTitle}>Steps Preview</h2>
+                        <img 
+                            src={stepsImageUrl} 
+                            alt="Street View of Steps" 
+                            onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.src = 'placeholder-image-url.jpg';
+                                target.alt = 'Street View not available';
+                            }}
+                        />
                         <div className={styles.modalButtons}>
-                            <PlainButton onClick={() => setShowStepsModal(false)}>Close</PlainButton>
-                            <PlainButton onClick={() => {
-                                setShowStepsModal(false)
+                            <button onClick={() => setShowStepsModal(false)}>Close</button>
+                            <button onClick={() => {
+                                setShowStepsModal(false);
                                 // Add logic here to skip this obstacle
-                            }}>Skip this obstacle</PlainButton>
+                            }}>Skip this obstacle</button>
                         </div>
                     </div>
                 </div>
