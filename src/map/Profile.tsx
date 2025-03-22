@@ -7,6 +7,7 @@ import SignupWizard, { WizardData } from '@/components/SignupWizard/SignupWizard
 import { userPreferencesStore } from '@/stores/UserPreferencesStore'
 import ProfileEdit from './ProfileEdit'
 import UserData from './UserData'
+import PathAvoidanceEdit from './PathAvoidance'
 
 interface ProfileState {
     isLoggedIn: boolean
@@ -39,7 +40,7 @@ export default function Profile({ isOpen, onClose }: ProfileProps) {
     const [showWizard, setShowWizard] = useState(false)
     const [showProfileEdit, setShowProfileEdit] = useState(false)
     const [showUserData, setShowUserData] = useState(false)
-
+    const [showPathAvoidanceEdit, setShowPathAvoidanceEdit] = useState(false)
     useEffect(() => {
         const checkAuth = async () => {
             const user = await AuthService.getCurrentUser()
@@ -161,9 +162,9 @@ export default function Profile({ isOpen, onClose }: ProfileProps) {
                                 <span className={styles.icon}>👤</span>
                                 {tr('Your profile')}
                             </button>
-                            <button className={styles.menuItem}>
+                            <button className={styles.menuItem} onClick={() => setShowPathAvoidanceEdit(true)}>
                                 <span className={styles.icon}>📊</span>
-                                {tr('Your timeline')}
+                                {tr('Community')}
                             </button>
                             <button className={styles.menuItem}>
                                 <span className={styles.icon}>📍</span>
@@ -268,6 +269,12 @@ export default function Profile({ isOpen, onClose }: ProfileProps) {
             {showUserData && (
                 <UserData
                     onClose={() => setShowUserData(false)}
+                />
+            )}
+
+            {showPathAvoidanceEdit && (
+                <PathAvoidanceEdit
+                    onClose={() => setShowPathAvoidanceEdit(false)}
                 />
             )}
         </div>

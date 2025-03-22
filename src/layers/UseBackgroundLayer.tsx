@@ -42,7 +42,24 @@ function addNewBackgroundLayers(map: Map, styleOption: StyleOption) {
             }),
         })
         tileLayer.set('background-raster-layer', true)
-        map.addLayer(tileLayer)
+        if (Array.isArray(rasterStyle.url)) {
+            // If url is an array, create and add a tile layer for each URL
+            rasterStyle.url.forEach(url => {
+            const layer = new TileLayer({
+                source: new XYZ({
+                urls: [url],
+                maxZoom: rasterStyle.maxZoom,
+                attributions: [rasterStyle.attribution],
+                tilePixelRatio: rasterStyle.tilePixelRatio,
+                }),
+            })
+            layer.set('background-raster-layer', true)
+            map.addLayer(layer)
+            })
+        } else {
+            // Single URL case
+            map.addLayer(tileLayer)
+        }
     }
 }
 

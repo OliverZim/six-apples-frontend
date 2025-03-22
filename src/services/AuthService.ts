@@ -7,7 +7,8 @@ interface AuthResponse {
 }
 
 export class AuthService {
-    private static API_URL = 'http://localhost:3001/api/auth';
+    private static API_URL = 'https://six-apples-db.dieprogrammi.de/api/auth';
+    //private static API_URL = 'http://localhost:3001/api/auth';
 
     static async login(email: string, password: string): Promise<AuthResponse> {
         try {
