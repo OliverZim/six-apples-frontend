@@ -6,6 +6,7 @@ import { AuthService } from '@/services/AuthService'
 import SignupWizard, { WizardData } from '@/components/SignupWizard/SignupWizard'
 import { userPreferencesStore } from '@/stores/UserPreferencesStore'
 import ProfileEdit from './ProfileEdit'
+import UserData from './UserData'
 
 interface ProfileState {
     isLoggedIn: boolean
@@ -37,6 +38,7 @@ export default function Profile({ isOpen, onClose }: ProfileProps) {
     })
     const [showWizard, setShowWizard] = useState(false)
     const [showProfileEdit, setShowProfileEdit] = useState(false)
+    const [showUserData, setShowUserData] = useState(false)
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -167,7 +169,7 @@ export default function Profile({ isOpen, onClose }: ProfileProps) {
                                 <span className={styles.icon}>📍</span>
                                 {tr('Location sharing')}
                             </button>
-                            <button className={styles.menuItem}>
+                            <button className={styles.menuItem} onClick={() => setShowUserData(true)}>
                                 <span className={styles.icon}>🔒</span>
                                 {tr('Your data')}
                             </button>
@@ -260,6 +262,12 @@ export default function Profile({ isOpen, onClose }: ProfileProps) {
                     email={profileState.email}
                     onClose={() => setShowProfileEdit(false)}
                     onUpdate={handleProfileUpdate}
+                />
+            )}
+
+            {showUserData && (
+                <UserData
+                    onClose={() => setShowUserData(false)}
                 />
             )}
         </div>

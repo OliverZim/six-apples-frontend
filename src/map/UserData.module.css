@@ -1,0 +1,186 @@
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal {
+    background: white;
+    border-radius: 8px;
+    padding: 24px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.header h2 {
+    margin: 0;
+    font-size: 24px;
+    color: #333;
+}
+
+.closeButton {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px;
+    color: #666;
+}
+
+.closeButton:hover {
+    color: #333;
+}
+
+.error {
+    color: #d32f2f;
+    margin-bottom: 16px;
+    padding: 12px;
+    background: #ffebee;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.success {
+    color: #2e7d32;
+    margin-bottom: 16px;
+    padding: 12px;
+    background: #e8f5e9;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.section {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.section h3 {
+    margin: 0 0 16px 0;
+    font-size: 18px;
+    color: #333;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.formGroup:last-child {
+    margin-bottom: 0;
+}
+
+.formGroup label {
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+}
+
+.formGroup select,
+.formGroup input[type="range"] {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 100%;
+}
+
+.formGroup select {
+    background: white;
+}
+
+.formGroup select:focus,
+.formGroup input[type="range"]:focus {
+    outline: none;
+    border-color: #1a73e8;
+    box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+}
+
+.rangeValue {
+    font-size: 14px;
+    color: #666;
+    text-align: right;
+}
+
+.checkboxGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.checkboxLabel {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #666;
+    cursor: pointer;
+}
+
+.checkboxLabel input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.cancelButton {
+    padding: 10px 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: white;
+    color: #666;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.cancelButton:hover {
+    background: #f5f5f5;
+}
+
+.saveButton {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    background: #1a73e8;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.saveButton:hover {
+    background: #1557b0;
+} 
