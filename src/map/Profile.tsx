@@ -94,7 +94,7 @@ export default function Profile({ isOpen, onClose }: ProfileProps) {
     const handleWizardComplete = async (data: WizardData) => {
         const success = await AuthService.savePreferences({
             difficulty: data.difficulty,
-            maxSlope: data.preferences.maxSlope,
+            age: data.preferences.age,
             avoidStairs: data.preferences.avoidStairs,
             preferElevators: data.preferences.preferElevators
         });
