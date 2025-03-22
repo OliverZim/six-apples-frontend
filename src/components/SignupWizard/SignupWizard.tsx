@@ -4,6 +4,7 @@ import styles from './SignupWizard.module.css';
 interface SignupWizardProps {
     onComplete: (data: WizardData) => void;
     onClose: () => void;
+    username: string;
 }
 
 export interface WizardData {
@@ -15,7 +16,7 @@ export interface WizardData {
     };
 }
 
-const SignupWizard: React.FC<SignupWizardProps> = ({ onComplete, onClose }) => {
+const SignupWizard: React.FC<SignupWizardProps> = ({ onComplete, onClose, username }) => {
     const [currentStep, setCurrentStep] = useState(1);
     const [wizardData, setWizardData] = useState<WizardData>({
         difficulty: 'no impairment',
@@ -158,7 +159,7 @@ const SignupWizard: React.FC<SignupWizardProps> = ({ onComplete, onClose }) => {
     return (
         <div className={styles.wizard}>
             <div className={styles.header}>
-                <h1>Welcome to Six Apples</h1>
+                <h1>Welcome {username}</h1>
                 <button className={styles.closeButton} onClick={onClose}>×</button>
             </div>
             <div className={styles.progress}>

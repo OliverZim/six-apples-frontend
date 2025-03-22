@@ -244,6 +244,7 @@ export default function Profile({ isOpen, onClose }: ProfileProps) {
                 <SignupWizard
                     onComplete={handleWizardComplete}
                     onClose={handleWizardClose}
+                    username={profileState.username || ''}
                 />
             )}
         </div>
