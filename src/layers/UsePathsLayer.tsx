@@ -151,7 +151,7 @@ type SurfaceInfo = {
 
 let surfaceMap = new Map();
 surfaceMap.set('asphalt', { color: '#000000', url: 'https://wiki.openstreetmap.org/w/images/thumb/5/56/Surface_asphalt.jpg/200px-Surface_asphalt.jpg' });
-surfaceMap.set('unpaved', { color: '#D2B48C', url: 'https://wiki.openstreetmap.org/w/images/thumb/5/5e/Surface_unpaved.jpg/200px-Surface_unpaved.jpg' });
+surfaceMap.set('unpaved', { color: '#D2B48C', url: 'https://media.licdn.com/dms/image/v2/C4E12AQHbo74SFyQv2Q/article-cover_image-shrink_600_2000/article-cover_image-shrink_600_2000/0/1604509075066?e=2147483647&v=beta&t=gxjhySC4Kbls7jfKfE30NKoP-aUJjASv3iIU0B6D4GA' });
 surfaceMap.set('paved', { color: '#C0C0C0', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Paved_mosaic.png/200px-Paved_mosaic.png' });
 surfaceMap.set('concrete', { color: '#808080', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Magallanes%2C_ruta_9%2C_2.jpg/200px-Magallanes%2C_ruta_9%2C_2.jpg' });
 surfaceMap.set('paving_stones', { color: '#A52A2A', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Mix_of_paving_stones_IMG_20200910_163455.jpg/200px-Mix_of_paving_stones_IMG_20200910_163455.jpg' });
@@ -166,7 +166,7 @@ surfaceMap.set('fine_gravel', { color: '#CD853F', url: 'https://upload.wikimedia
 surfaceMap.set('wood', { color: '#A0522D', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Bridge-path-straight-wooden_%2824029070260%29.jpg/200px-Bridge-path-straight-wooden_%2824029070260%29.jpg' });
 surfaceMap.set('concrete:plates', { color: '#B0C4DE', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Bypass_road_made_of_big_concrete_plates.jpg/200px-Bypass_road_made_of_big_concrete_plates.jpg' });
 surfaceMap.set('earth', { color: '#8B4513', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Rainy_dirt_road_on_the_Tibetan_Plateau.jpg/200px-Rainy_dirt_road_on_the_Tibetan_Plateau.jpg' });
-surfaceMap.set('cobblestone', { color: '#2F4F4F', url: 'https://wiki.openstreetmap.org/w/images/thumb/1/1e/Surface_cobblestone.jpg/200px-Surface_cobblestone.jpg' });
+surfaceMap.set('cobblestone', { color: '#2F4F4F', url: "https://www.minecraft101.net/b/cobblestone_mossy.png"});
 surfaceMap.set('pebblestone', { color: '#BC8F8F', url: 'https://wiki.openstreetmap.org/w/images/thumb/8/86/Dscf1829-800.jpg/200px-Dscf1829-800.jpg' });
 surfaceMap.set('grass_paver', { color: '#32CD32', url: 'https://wiki.openstreetmap.org/w/images/thumb/3/3d/Dscf1611-800.jpg/200px-Dscf1611-800.jpg' });
 surfaceMap.set('metal', { color: '#B0C4DE', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Tread_chrome_metal.jpg/200px-Tread_chrome_metal.jpg' });
