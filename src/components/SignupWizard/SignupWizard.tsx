@@ -7,9 +7,9 @@ interface SignupWizardProps {
 }
 
 export interface WizardData {
-    difficulty: 'normal' | 'prosthesis' | 'wheelchair' | 'severely_disabled';
+    difficulty: 'no impairment' | 'crutches/walking stick' | 'prosthesis' | 'wheelchair';
     preferences: {
-        maxSlope: number;
+        age: number;
         avoidStairs: boolean;
         preferElevators: boolean;
     };
@@ -18,9 +18,9 @@ export interface WizardData {
 const SignupWizard: React.FC<SignupWizardProps> = ({ onComplete, onClose }) => {
     const [currentStep, setCurrentStep] = useState(1);
     const [wizardData, setWizardData] = useState<WizardData>({
-        difficulty: 'normal',
+        difficulty: 'no impairment',
         preferences: {
-            maxSlope: 5,
+            age: 30,
             avoidStairs: false,
             preferElevators: false,
         },
@@ -55,10 +55,16 @@ const SignupWizard: React.FC<SignupWizardProps> = ({ onComplete, onClose }) => {
                         <h2>Select Your Difficulty Level</h2>
                         <div className={styles.options}>
                             <button
-                                className={`${styles.option} ${wizardData.difficulty === 'normal' ? styles.selected : ''}`}
-                                onClick={() => handleDifficultySelect('normal')}
+                                className={`${styles.option} ${wizardData.difficulty === 'no impairment' ? styles.selected : ''}`}
+                                onClick={() => handleDifficultySelect('no impairment')}
                             >
-                                Normal
+                                No Impairment
+                            </button>
+                            <button
+                                className={`${styles.option} ${wizardData.difficulty === 'crutches/walking stick' ? styles.selected : ''}`}
+                                onClick={() => handleDifficultySelect('crutches/walking stick')}
+                            >
+                                Crutches/Walking Stick
                             </button>
                             <button
                                 className={`${styles.option} ${wizardData.difficulty === 'prosthesis' ? styles.selected : ''}`}
@@ -72,12 +78,6 @@ const SignupWizard: React.FC<SignupWizardProps> = ({ onComplete, onClose }) => {
                             >
                                 Wheelchair
                             </button>
-                            <button
-                                className={`${styles.option} ${wizardData.difficulty === 'severely_disabled' ? styles.selected : ''}`}
-                                onClick={() => handleDifficultySelect('severely_disabled')}
-                            >
-                                Severely Disabled
-                            </button>
                         </div>
                     </div>
                 );
@@ -87,21 +87,21 @@ const SignupWizard: React.FC<SignupWizardProps> = ({ onComplete, onClose }) => {
                         <h2>Set Your Preferences</h2>
                         <div className={styles.preferences}>
                             <div className={styles.preferenceItem}>
-                                <label>Maximum Slope (%)</label>
+                                <label>Age</label>
                                 <input
                                     type="range"
                                     min="0"
-                                    max="15"
-                                    value={wizardData.preferences.maxSlope}
+                                    max="100"
+                                    value={wizardData.preferences.age}
                                     onChange={(e) => setWizardData(prev => ({
                                         ...prev,
                                         preferences: {
                                             ...prev.preferences,
-                                            maxSlope: Number(e.target.value),
+                                            age: Number(e.target.value),
                                         },
                                     }))}
                                 />
-                                <span>{wizardData.preferences.maxSlope}%</span>
+                                <span>{wizardData.preferences.age}</span>
                             </div>
                             <div className={styles.preferenceItem}>
                                 <label>
@@ -144,7 +144,7 @@ const SignupWizard: React.FC<SignupWizardProps> = ({ onComplete, onClose }) => {
                         <h2>Review Your Settings</h2>
                         <div className={styles.review}>
                             <p><strong>Difficulty Level:</strong> {wizardData.difficulty}</p>
-                            <p><strong>Maximum Slope:</strong> {wizardData.preferences.maxSlope}%</p>
+                            <p><strong>Age:</strong> {wizardData.preferences.age}</p>
                             <p><strong>Avoid Stairs:</strong> {wizardData.preferences.avoidStairs ? 'Yes' : 'No'}</p>
                             <p><strong>Prefer Elevators:</strong> {wizardData.preferences.preferElevators ? 'Yes' : 'No'}</p>
                         </div>
