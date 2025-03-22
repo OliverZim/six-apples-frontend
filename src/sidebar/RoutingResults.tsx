@@ -29,15 +29,13 @@ import DangerousIcon from '@/sidebar/routeHints/warn_report.svg'
 import { Bbox } from '@/api/graphhopper'
 import { SettingsContext } from '@/contexts/SettingsContext'
 import { Settings } from '@/stores/SettingsStore'
-import { RouteStoreState } from '@/stores/RouteStore'
-import { getClosestStreetViewImage } from '@/api/fetchimage'
+
 export interface RoutingResultsProps {
     info: RoutingResultInfo
     paths: Path[]
     selectedPath: Path
     currentRequest: CurrentRequest
     profile: string
-    route: RouteStoreState
 }
 
 export default function RoutingResults(props: RoutingResultsProps) {
@@ -53,13 +51,11 @@ function RoutingResult({
     path,
     isSelected,
     profile,
-    route
 }: {
     info: RoutingResultInfo
     path: Path
     isSelected: boolean
     profile: string
-    route: RouteStoreState
 }) {
     const [isExpanded, setExpanded] = useState(false)
     const [selectedRH, setSelectedRH] = useState('')
@@ -119,46 +115,6 @@ function RoutingResult({
         mtbRatingInfo.distance > 0 ||
         hikeRatingInfo.distance > 0 ||
         steepInfo.distance > 0
-        
-        const [stepsImageUrl, setStepsImageUrl] = useState<string>("")
-    
-        useEffect(() => {
-            const fetchStepsImage = async () => {
-                if (route.routingResult && route.routingResult.paths && route.routingResult.paths.length > 0) {
-                    const path = route.routingResult.paths[0];
-                    const coordinates = path.points.coordinates ? path.points.coordinates : [];
-                    
-                    // Check if road_class details exist and look for steps
-                    if (path.details && path.details.road_class) {
-                        for (const detail of path.details.road_class) {
-                            // Check if the road class is "steps"
-                            if (detail.length === 3 && detail[2] === "steps") {
-                                const startIndex = detail[0];
-                                
-                                // Make sure the index is valid
-                                if (startIndex < coordinates.length) {
-                                    const stepsCoord = coordinates[startIndex];
-                                    
-                                    // Get the street view image for the steps location
-                                    const imageUrl = await getClosestStreetViewImage(stepsCoord[0], stepsCoord[1]);
-                                    
-                                    // Set the image URL for display
-                                    setStepsImageUrl(imageUrl);
-                                    
-                                    // Break after finding the first occurrence of steps
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    // Clear the image if no route is available
-                    setStepsImageUrl("");
-                }
-            }
-            
-            fetchStepsImage();
-        }, [route])
 
     return (
         <div className={styles.resultRow}>
@@ -185,6 +141,12 @@ function RoutingResult({
                             </span>
                         )}
                     </div>
+                    {isSelected && (
+                        <PlainButton className={styles.exportButton} onClick={() => downloadGPX(path, settings)}>
+                            <GPXDownload />
+                            <div>{tr('gpx_button')}</div>
+                        </PlainButton>
+                    )}
                     {isSelected && (
                         <PlainButton
                             className={isExpanded ? styles.detailsButtonExpanded : styles.detailsButton}
@@ -338,9 +300,6 @@ function RoutingResult({
                             segments={stepsInfo.segments}
                             values={[]}
                         />
-
-            <img src={stepsImageUrl} alt="Street View of Steps" />
-            
                         <RHButton
                             setDescription={b => setDescriptionRH(b)}
                             description={tr('way_contains', [tr('tracks')])}
@@ -562,6 +521,62 @@ function getHighSlopeInfo(points: LineString, steepSlope: number, showDistanceIn
     return info
 }
 
+function downloadGPX(path: Path, settings: Settings) {
+    let xmlString =
+        '<?xml version="1.0" encoding="UTF-8" standalone="no" ?><gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" creator="GraphHopper" version="1.1" xmlns:gh="https://graphhopper.com/public/schema/gpx/1.1">\n'
+    xmlString += `<metadata><copyright author="OpenStreetMap contributors"/><link href="http://graphhopper.com"><text>GraphHopper GPX</text></link><time>${new Date().toISOString()}</time></metadata>\n`
+
+    const rte = settings.gpxExportRte
+    const wpt = settings.gpxExportWpt
+    const trk = settings.gpxExportTrk
+
+    if (wpt)
+        xmlString += path.snapped_waypoints.coordinates.reduce((prevString: string, coord: Position) => {
+            return prevString + `<wpt lat="${coord[1]}" lon="${coord[0]}"></wpt>\n`
+        }, '')
+
+    if (rte) {
+        xmlString += '<rte>\n'
+        xmlString += path.instructions.reduce((prevString: string, instruction: Instruction) => {
+            let routeSegment = `<rtept lat="${instruction.points[0][1].toFixed(
+                6
+            )}" lon="${instruction.points[0][0].toFixed(6)}">`
+            routeSegment += `<desc>${instruction.text}</desc><extensions><gh:distance>${instruction.distance}</gh:distance>`
+            routeSegment += `<gh:time>${instruction.time}</gh:time><gh:sign>${instruction.sign}</gh:sign>`
+            // TODO routeSegment += `<gh:direction>SW</gh:direction><gh:azimuth>222.57</gh:azimuth>` +
+            routeSegment += '</extensions></rtept>\n'
+            return prevString + routeSegment
+        }, '')
+        xmlString += '</rte>\n'
+    }
+
+    if (trk) {
+        xmlString += '<trk>\n<name>GraphHopper Track</name><desc></desc>\n<trkseg>'
+        // TODO include time via path.details.time
+        xmlString += path.points.coordinates.reduce((prevString, coord) => {
+            let trackPoint = '<trkpt '
+            trackPoint += `lat="${coord[1].toFixed(6)}" lon="${coord[0].toFixed(6)}">`
+            if (coord.length > 2) trackPoint += `<ele>${coord[2].toFixed(1)}</ele>`
+            trackPoint += '</trkpt>\n'
+            return prevString + trackPoint
+        }, '')
+        xmlString += '</trkseg></trk>\n</gpx>'
+    }
+
+    const tmpElement = document.createElement('a')
+    const file = new Blob([xmlString], { type: 'application/gpx+xml' })
+    tmpElement.href = URL.createObjectURL(file)
+    const date = new Date()
+    tmpElement.download = `GraphHopper-Track-${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(
+        date.getUTCDate()
+    )}-${metersToTextForFile(path.distance, settings.showDistanceInMiles)}.gpx`
+    tmpElement.click()
+}
+
+function pad(value: number) {
+    return value < 10 ? '0' + value : '' + value
+}
+
 function RoutingResultPlaceholder() {
     return (
         <div className={styles.resultRow}>
@@ -593,12 +608,12 @@ function getLength(paths: Path[], subRequests: SubRequest[]) {
 
 function createSingletonListContent(props: RoutingResultsProps) {
     if (props.paths.length > 0)
-        return <RoutingResult path={props.selectedPath} isSelected={true} profile={props.profile} info={props.info} route={props.route}/>
+        return <RoutingResult path={props.selectedPath} isSelected={true} profile={props.profile} info={props.info} />
     if (hasPendingRequests(props.currentRequest.subRequests)) return <RoutingResultPlaceholder key={1} />
     return ''
 }
 
-function createListContent({ info, paths, currentRequest, selectedPath, profile, route }: RoutingResultsProps) {
+function createListContent({ info, paths, currentRequest, selectedPath, profile }: RoutingResultsProps) {
     const length = getLength(paths, currentRequest.subRequests)
     const result = []
 
@@ -611,7 +626,6 @@ function createListContent({ info, paths, currentRequest, selectedPath, profile,
                     isSelected={paths[i] === selectedPath}
                     profile={profile}
                     info={info}
-                    route={route}
                 />
             )
         else result.push(<RoutingResultPlaceholder key={i} />)
