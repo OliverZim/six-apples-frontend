@@ -1,7 +1,7 @@
 
 import { CustomModel } from "../QueryStore"
 
-const EXCLUDE_AREA = 100000 // meter
+const EXCLUDE_AREA = 1 // meter
 const EXCLUDE_AREA_LAT = 8.98311174991017e-06 * EXCLUDE_AREA
 const EXCLUDE_AREA_LON = 1.4763165177199368e-05 * EXCLUDE_AREA
 
@@ -14,7 +14,7 @@ export function getCustomModel(excludePoints: [number, number][]): CustomModel {
   for (let i = 0; i < excludePoints.length; i++) {
     let id = `area${i}`;
     areas.push({ point: excludePoints[i], id: id });
-    speeds.push(speedJSON(`in_${id}`, 1));
+    speeds.push(speedJSON(`in_${id}`, 0));
   }
 
   const obj = {
