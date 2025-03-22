@@ -64,6 +64,8 @@ function RoutingResult({
     const [isExpanded, setExpanded] = useState(false)
     const [selectedRH, setSelectedRH] = useState('')
     const [descriptionRH, setDescriptionRH] = useState('')
+    const [showStepsModal, setShowStepsModal] = useState(false)
+    const [stepsImageUrl, setStepsImageUrl] = useState<string>("")
     const resultSummaryClass = isSelected
         ? styles.resultSummary + ' ' + styles.selectedResultSummary
         : styles.resultSummary
@@ -120,45 +122,17 @@ function RoutingResult({
         hikeRatingInfo.distance > 0 ||
         steepInfo.distance > 0
         
-        const [stepsImageUrl, setStepsImageUrl] = useState<string>("")
-    
-        useEffect(() => {
-            const fetchStepsImage = async () => {
-                if (route.routingResult && route.routingResult.paths && route.routingResult.paths.length > 0) {
-                    const path = route.routingResult.paths[0];
-                    const coordinates = path.points.coordinates ? path.points.coordinates : [];
-                    
-                    // Check if road_class details exist and look for steps
-                    if (path.details && path.details.road_class) {
-                        for (const detail of path.details.road_class) {
-                            // Check if the road class is "steps"
-                            if (detail.length === 3 && detail[2] === "steps") {
-                                const startIndex = detail[0];
-                                
-                                // Make sure the index is valid
-                                if (startIndex < coordinates.length) {
-                                    const stepsCoord = coordinates[startIndex];
-                                    
-                                    // Get the street view image for the steps location
-                                    const imageUrl = await getClosestStreetViewImage(stepsCoord[0], stepsCoord[1]);
-                                    
-                                    // Set the image URL for display
-                                    setStepsImageUrl(imageUrl);
-                                    
-                                    // Break after finding the first occurrence of steps
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    // Clear the image if no route is available
-                    setStepsImageUrl("");
-                }
+    const handleStepsClick = async (segments: Coordinate[][]) => {
+        if (segments && segments.length > 0) {
+            const firstSegment = segments[0]
+            if (firstSegment && firstSegment.length > 0) {
+                const firstPoint = firstSegment[0]
+                const imageUrl = await getClosestStreetViewImage(firstPoint.lng, firstPoint.lat)
+                setStepsImageUrl(imageUrl)
+                setShowStepsModal(true)
             }
-            
-            fetchStepsImage();
-        }, [route])
+        }
+    }
 
     return (
         <div className={styles.resultRow}>
@@ -337,9 +311,23 @@ function RoutingResult({
                             selected={selectedRH}
                             segments={stepsInfo.segments}
                             values={[]}
+                            onClick={() => handleStepsClick(stepsInfo.segments)}
                         />
 
-            <img src={stepsImageUrl} alt="Street View of Steps" />
+            {showStepsModal && (
+                <div className={styles.modalOverlay}>
+                    <div className={styles.modalContent}>
+                        <img src={stepsImageUrl} alt="Street View of Steps" style={{ maxWidth: '100%', maxHeight: '70vh' }} />
+                        <div className={styles.modalButtons}>
+                            <PlainButton onClick={() => setShowStepsModal(false)}>Close</PlainButton>
+                            <PlainButton onClick={() => {
+                                setShowStepsModal(false)
+                                // Add logic here to skip this obstacle
+                            }}>Skip this obstacle</PlainButton>
+                        </div>
+                    </div>
+                </div>
+            )}
             
                         <RHButton
                             setDescription={b => setDescriptionRH(b)}
@@ -417,6 +405,7 @@ function RHButton(p: {
     selected: string
     segments: Coordinate[][]
     values: string[]
+    onClick?: () => void
 }) {
     let [index, setIndex] = useState(0)
     if (p.value === false) return null
@@ -447,6 +436,7 @@ function RHButton(p: {
                 }
 
                 setIndex(index + 1 >= p.segments.length ? -1 : index + 1)
+                if (p.onClick) p.onClick()
             }}
             title={p.description}
         >
