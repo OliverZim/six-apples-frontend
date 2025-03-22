@@ -1,8 +1,4 @@
-interface User {
-    id: number;
-    username: string;
-    email: string;
-}
+import { User, UserPreferences } from '@/server/src/services/auth';
 
 interface AuthResponse {
     success: boolean;
@@ -44,6 +40,24 @@ export class AuthService {
         } catch (error) {
             console.error('Signup error:', error);
             return { success: false, error: 'Network error' };
+        }
+    }
+
+    static async savePreferences(preferences: UserPreferences): Promise<boolean> {
+        try {
+            const response = await fetch(`${this.API_URL}/preferences`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify(preferences),
+            });
+            const data = await response.json();
+            return data.success;
+        } catch (error) {
+            console.error('Save preferences error:', error);
+            return false;
         }
     }
 

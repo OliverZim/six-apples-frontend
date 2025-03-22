@@ -3,6 +3,8 @@ import styles from './Profile.module.css'
 import { tr } from '@/translation/Translation'
 import compassLogo from './compass-logo.png'
 import { AuthService } from '@/services/AuthService'
+import SignupWizard, { WizardData } from '@/components/SignupWizard/SignupWizard'
+import { userPreferencesStore } from '@/stores/UserPreferencesStore'
 
 interface ProfileState {
     isLoggedIn: boolean
@@ -32,6 +34,7 @@ export default function Profile({ isOpen, onClose }: ProfileProps) {
         email: '',
         password: ''
     })
+    const [showWizard, setShowWizard] = useState(false)
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -69,6 +72,11 @@ export default function Profile({ isOpen, onClose }: ProfileProps) {
                     username: response.user.username,
                     email: response.user.email
                 })
+                
+                // Show wizard only after successful signup
+                if (!isLogin) {
+                    setShowWizard(true)
+                }
             } else {
                 setError(response.error || 'Authentication failed')
             }
@@ -80,6 +88,27 @@ export default function Profile({ isOpen, onClose }: ProfileProps) {
     const handleLogout = async () => {
         await AuthService.logout()
         setProfileState({ isLoggedIn: false })
+        userPreferencesStore.resetPreferences()
+    }
+
+    const handleWizardComplete = async (data: WizardData) => {
+        const success = await AuthService.savePreferences({
+            difficulty: data.difficulty,
+            maxSlope: data.preferences.maxSlope,
+            avoidStairs: data.preferences.avoidStairs,
+            preferElevators: data.preferences.preferElevators
+        });
+        
+        if (success) {
+            userPreferencesStore.setPreferences(data);
+            setShowWizard(false);
+        } else {
+            setError('Failed to save preferences. Please try again.');
+        }
+    }
+
+    const handleWizardClose = () => {
+        setShowWizard(false)
     }
 
     if (!isOpen) return null
@@ -210,6 +239,13 @@ export default function Profile({ isOpen, onClose }: ProfileProps) {
                     <a href="#">{tr('Terms of Service')}</a>
                 </div>
             </div>
+
+            {showWizard && (
+                <SignupWizard
+                    onComplete={handleWizardComplete}
+                    onClose={handleWizardClose}
+                />
+            )}
         </div>
     )
 } 

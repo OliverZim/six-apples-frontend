@@ -22,6 +22,15 @@ const schema = `
         password_hash VARCHAR(255) NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
+
+    CREATE TABLE IF NOT EXISTS user_preferences (
+        user_id INTEGER PRIMARY KEY,
+        difficulty VARCHAR(50) NOT NULL,
+        max_slope INTEGER NOT NULL,
+        avoid_stairs BOOLEAN NOT NULL,
+        prefer_elevators BOOLEAN NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users(id)
+    );
 `;
 
 db.exec(schema, (err) => {
