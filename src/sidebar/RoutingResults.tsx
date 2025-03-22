@@ -3,7 +3,7 @@ import { Coordinate, CurrentRequest, getBBoxFromCoord, RequestState, SubRequest 
 import styles from './RoutingResult.module.css'
 import { ReactNode, useContext, useEffect, useState } from 'react'
 import Dispatcher from '@/stores/Dispatcher'
-import { PathDetailsElevationSelected, SetBBox, SetSelectedPath } from '@/actions/Actions'
+import { PathDetailsElevationSelected, SetBBox, SetSelectedPath, SetCustomModel, SetCustomModelEnabled } from '@/actions/Actions'
 import { metersToShortText, metersToTextForFile, milliSecondsToText } from '@/Converters'
 import PlainButton from '@/PlainButton'
 import Details from '@/sidebar/list.svg'
@@ -49,6 +49,8 @@ export default function RoutingResults(props: RoutingResultsProps) {
     return <ul>{isShortScreen ? createSingletonListContent(props) : createListContent(props)}</ul>
 }
 
+
+
 function RoutingResult({
     info,
     path,
@@ -66,6 +68,7 @@ function RoutingResult({
     const [selectedRH, setSelectedRH] = useState('')
     const [descriptionRH, setDescriptionRH] = useState('')
     const [showStepsModal, setShowStepsModal] = useState(false)
+    const [StepsFirstPoint, setStepsFirstPoint] = useState<Coordinate | null>(null)
     const [stepsImageUrl, setStepsImageUrl] = useState<string>("")
     const [imageError, setImageError] = useState(false)
     const resultSummaryClass = isSelected
@@ -123,6 +126,51 @@ function RoutingResult({
         mtbRatingInfo.distance > 0 ||
         hikeRatingInfo.distance > 0 ||
         steepInfo.distance > 0
+
+        function SkipObStacle() {
+            // Define constants here
+            const MIN_MULTIPLIER = 0
+            const BUFFER = 0.0004  // Using a slightly larger buffer for better coverage
+            const DEFAULT_LONGITUDE = StepsFirstPoint ? StepsFirstPoint.lng - BUFFER : 13.362122
+            const ALT_LONGITUDE = StepsFirstPoint ? StepsFirstPoint.lng + BUFFER : 13.447952  
+            const DEFAULT_LATITUDE = StepsFirstPoint ? StepsFirstPoint.lat - BUFFER : 52.493029
+            const ALT_LATITUDE = StepsFirstPoint ? StepsFirstPoint.lat + BUFFER : 52.530221
+        
+            const customModelText = `{
+          "priority": [
+            {
+              "if": "in_area1",
+              "multiply_by": "${MIN_MULTIPLIER}"
+            }
+          ],
+          "areas": {
+            "type": "FeatureCollection",
+            "features": [
+              {
+                "id": "area1",
+                "properties": {},
+                "type": "Feature",
+                "geometry": {
+                  "type": "Polygon",
+                  "coordinates": [
+                    [
+                      [${DEFAULT_LONGITUDE}, ${DEFAULT_LATITUDE}],
+                      [${ALT_LONGITUDE}, ${DEFAULT_LATITUDE}],
+                      [${ALT_LONGITUDE}, ${ALT_LATITUDE}],
+                      [${DEFAULT_LONGITUDE}, ${ALT_LATITUDE}],
+                      [${DEFAULT_LONGITUDE}, ${DEFAULT_LATITUDE}]
+                    ]
+                  ]
+                }
+              }
+            ]
+          }
+        }`
+        
+            // Use Dispatcher.dispatch directly
+            Dispatcher.dispatch(new SetCustomModel(customModelText, true))
+            Dispatcher.dispatch(new SetCustomModelEnabled(true))
+        }
         
     const handleStepsClick = async (segments: Coordinate[][]) => {
         if (segments && segments.length > 0) {
@@ -133,6 +181,7 @@ function RoutingResult({
                 setStepsImageUrl(imageUrl)
                 setImageError(false)
                 setShowStepsModal(true)
+                setStepsFirstPoint(firstPoint);
             }
         }
     }
@@ -336,7 +385,8 @@ function RoutingResult({
                             <button onClick={() => setShowStepsModal(false)}>Close</button>
                             <button onClick={() => {
                                 setShowStepsModal(false);
-                                // Add logic here to skip this obstacle
+                                // Skip this obstacle by calling the SkipObStacle function
+                                SkipObStacle();
                             }}>Skip this obstacle</button>
                         </div>
                     </div>
